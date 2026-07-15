@@ -147,16 +147,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d87b52d1f184b2e9c6047e543f64722, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 5
+  keyboardControlScheme: 0
+  moveSpeed: 3.5
   turnRadius: 0.8
   stickDeadZone: 0.15
-  dashDistance: 3
-  dashDuration: 0.15
-  dashCooldown: 5
+  dashDistance: 2.5
+  dashDuration: 0.2
+  dashCooldown: 3
   ballGap: 0
   trailSampleDistance: 0.1
   ballFollowSpeed: 20
-  ballLaunchSpeed: 15
+  ballLaunchSpeed: 25
   launchClearance: 0.1
   attackInterval: 0.3
 --- !u!114 &8045469588288536989

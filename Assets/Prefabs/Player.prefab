@@ -32,7 +32,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -1.6282289, y: 0.55, z: -4.24}
-  m_LocalScale: {x: 0.49, y: 0.49, z: 0.49}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
@@ -160,15 +160,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc97fa5c971b2e64c96d6bb2c114c48e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 5
-  turnRadius: 1.5
+  keyboardControlScheme: 0
+  moveSpeed: 3.5
+  turnRadius: 0.8
   stickDeadZone: 0.15
-  dashDistance: 3
-  dashDuration: 0.15
-  dashCooldown: 5
+  dashDistance: 2.5
+  dashDuration: 0.2
+  dashCooldown: 3
   ballGap: 0
   trailSampleDistance: 0.1
   ballFollowSpeed: 20
-  ballLaunchSpeed: 15
+  ballLaunchSpeed: 25
   launchClearance: 0.1
   attackInterval: 0.3
