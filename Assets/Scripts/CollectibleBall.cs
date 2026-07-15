@@ -2,14 +2,15 @@ using UnityEngine;
 
 public class CollectibleBall : MonoBehaviour
 {
-    public enum BallColor
+    public enum BallType
     {
-        Blue,
-        Green,
-        Yellow
+        BeefBall,
+        FishBall,
+        Corn,
+        Broccoli
     }
 
-    [SerializeField] private BallColor color;
+    [SerializeField] private BallType ballType;
     [SerializeField, Min(0.001f)] private float worldRadius = 0.5f;
 
     private BallSpawn ownerPool;
@@ -19,16 +20,16 @@ public class CollectibleBall : MonoBehaviour
     private PlayerModel shooter;
     private bool isExplosive;
 
-    public BallColor Color => color;
+    public BallType Type => ballType;
     public float WorldRadius => worldRadius;
     public bool IsCollected { get; private set; }
     public PlayerModel ChainOwner => chainOwner;
     public bool IsExplosive => isExplosive;
 
-    public void Initialize(BallSpawn pool, BallColor newColor, Color displayColor)
+    public void Initialize(BallSpawn pool, BallType newType)
     {
         ownerPool = pool;
-        color = newColor;
+        ballType = newType;
         IsCollected = false;
         isLaunched = false;
         hitResolved = false;
@@ -52,12 +53,7 @@ public class CollectibleBall : MonoBehaviour
             ballBody.detectCollisions = true;
         }
 
-        Renderer[] renderers = GetComponentsInChildren<Renderer>();
-        foreach (Renderer ballRenderer in renderers)
-        {
-            ballRenderer.material.color = displayColor;
-        }
-
+        ownerPool.ApplyTypeVisual(this, newType);
         RefreshWorldRadius();
     }
 
@@ -169,17 +165,13 @@ public class CollectibleBall : MonoBehaviour
         isExplosive = value;
     }
 
-    public void SetColor(BallColor newColor)
+    public void SetType(BallType newType)
     {
-        color = newColor;
-        Color displayColor = ownerPool != null
-            ? ownerPool.GetDisplayColor(newColor)
-            : newColor == BallColor.Blue
-                ? UnityEngine.Color.blue
-                : newColor == BallColor.Green ? UnityEngine.Color.green : UnityEngine.Color.yellow;
-        foreach (Renderer ballRenderer in GetComponentsInChildren<Renderer>())
+        ballType = newType;
+        if (ownerPool != null)
         {
-            ballRenderer.material.color = displayColor;
+            ownerPool.ApplyTypeVisual(this, newType);
+            RefreshWorldRadius();
         }
     }
 

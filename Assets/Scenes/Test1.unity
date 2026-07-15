@@ -2881,8 +2881,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24538fa47cffb7946ab706f89ae17292, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ballPrefab: {fileID: 1917115418823056025, guid: 915abfaa5e78a4d48907e4b5fafe57e6,
-    type: 3}
+  beefBallPrefab: {fileID: 910115928289396852, guid: 79a667f1f4be86347a2ad66c8779ac89, type: 3}
+  fishBallPrefab: {fileID: 8899532088179001380, guid: 3e13afefdfd16ab42bff0a43a994e2e6, type: 3}
+  cornPrefab: {fileID: 8937306767875316923, guid: 13c34e0d649287d43a29853dc142a676, type: 3}
+  broccoliPrefab: {fileID: 846170714814602176, guid: 17ea79b18123d8948a90fef5a1581552, type: 3}
   ballCount: 40
   ballScale: 0.5
   specialItemPrefab: {fileID: 0}
@@ -2891,9 +2893,6 @@ MonoBehaviour:
   xRange: {x: -15, y: 15}
   zRange: {x: -15, y: 15}
   spawnHeight: 0.5
-  blue: {r: 0, g: 0, b: 1, a: 1}
-  green: {r: 0, g: 1, b: 0, a: 1}
-  yellow: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
 --- !u!1 &2100263037
 GameObject:
   m_ObjectHideFlags: 0

@@ -7,15 +7,15 @@ public class PlayerModel : MonoBehaviour
     [Serializable]
     public class CollectedBallData
     {
-        [SerializeField] private CollectibleBall.BallColor color;
+        [SerializeField] private CollectibleBall.BallType ballType;
         [SerializeField] private CollectibleBall ball;
 
-        public CollectibleBall.BallColor Color => ball != null ? ball.Color : color;
+        public CollectibleBall.BallType Type => ball != null ? ball.Type : ballType;
         public CollectibleBall Ball => ball;
 
         public CollectedBallData(CollectibleBall collectedBall)
         {
-            color = collectedBall.Color;
+            ballType = collectedBall.Type;
             ball = collectedBall;
         }
     }
@@ -68,7 +68,7 @@ public class PlayerModel : MonoBehaviour
         }
 
         // Insert immediately before the struck ball, then inspect the complete
-        // contiguous color group containing the projectile.
+        // contiguous food-type group containing the projectile.
         int insertedIndex = hitIndex;
         projectile.AttachToChain(this);
         collectedBalls.Insert(insertedIndex, new CollectedBallData(projectile));
@@ -96,16 +96,16 @@ public class PlayerModel : MonoBehaviour
             return;
         }
 
-        CollectibleBall.BallColor matchedColor = projectile.Color;
+        CollectibleBall.BallType matchedType = projectile.Type;
         int first = insertedIndex;
         int last = insertedIndex;
 
-        while (first > 0 && collectedBalls[first - 1].Color == matchedColor)
+        while (first > 0 && collectedBalls[first - 1].Type == matchedType)
         {
             first--;
         }
 
-        while (last + 1 < collectedBalls.Count && collectedBalls[last + 1].Color == matchedColor)
+        while (last + 1 < collectedBalls.Count && collectedBalls[last + 1].Type == matchedType)
         {
             last++;
         }
@@ -140,15 +140,15 @@ public class PlayerModel : MonoBehaviour
             return;
         }
 
-        CollectibleBall.BallColor infectedColor =
-            (CollectibleBall.BallColor)UnityEngine.Random.Range(0, 3);
+        CollectibleBall.BallType infectedType =
+            (CollectibleBall.BallType)UnityEngine.Random.Range(0, 4);
         int firstInfectedIndex = collectedBalls.Count / 2;
         for (int i = firstInfectedIndex; i < collectedBalls.Count; i++)
         {
             CollectibleBall ball = collectedBalls[i].Ball;
             if (ball != null)
             {
-                ball.SetColor(infectedColor);
+                ball.SetType(infectedType);
             }
         }
     }

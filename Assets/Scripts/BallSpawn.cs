@@ -6,7 +6,10 @@ using Random = UnityEngine.Random;
 public class BallSpawn : MonoBehaviour
 {
     [Header("Ball")]
-    [SerializeField] private GameObject ballPrefab;
+    [SerializeField] private GameObject beefBallPrefab;
+    [SerializeField] private GameObject fishBallPrefab;
+    [SerializeField] private GameObject cornPrefab;
+    [SerializeField] private GameObject broccoliPrefab;
     [SerializeField, Min(0)] private int ballCount = 20;
     [SerializeField, Min(0.01f)] private float ballScale = 1f;
     [SerializeField, Min(0.1f)] private float ballSpawnInterval = 60f;
@@ -21,11 +24,6 @@ public class BallSpawn : MonoBehaviour
     [SerializeField] private Vector2 xRange = new Vector2(-10f, 10f);
     [SerializeField] private Vector2 zRange = new Vector2(-10f, 10f);
     [SerializeField] private float spawnHeight = 0.5f;
-
-    [Header("Colors")]
-    [SerializeField] private Color blue = Color.blue;
-    [SerializeField] private Color green = Color.green;
-    [SerializeField] private Color yellow = Color.yellow;
 
     private readonly Queue<CollectibleBall> ballPool = new Queue<CollectibleBall>();
     private int spawnedBallCount;
@@ -65,6 +63,8 @@ public class BallSpawn : MonoBehaviour
     private void SpawnBall(int index)
     {
         Vector3 position = GetRandomSpawnPosition();
+        CollectibleBall.BallType randomType = GetRandomBallType();
+        GameObject ballPrefab = GetPrefab(randomType);
 
         GameObject ball = ballPrefab != null
             ? Instantiate(ballPrefab, position, Quaternion.identity, transform)
@@ -85,8 +85,12 @@ public class BallSpawn : MonoBehaviour
             collectibleBall = ball.AddComponent<CollectibleBall>();
         }
 
-        CollectibleBall.BallColor randomColor = GetRandomColor();
-        collectibleBall.Initialize(this, randomColor, GetDisplayColor(randomColor));
+        if (ball.GetComponentInChildren<Collider>(true) == null)
+        {
+            ball.AddComponent<SphereCollider>();
+        }
+
+        collectibleBall.Initialize(this, randomType);
     }
 
     /// <summary>
@@ -201,28 +205,46 @@ public class BallSpawn : MonoBehaviour
         ball.transform.position = worldPosition;
         ball.gameObject.SetActive(true);
 
-        CollectibleBall.BallColor randomColor = GetRandomColor();
-        ball.Initialize(this, randomColor, GetDisplayColor(randomColor));
+        ball.Initialize(this, GetRandomBallType());
         return ball;
     }
 
-    private CollectibleBall.BallColor GetRandomColor()
+    private static CollectibleBall.BallType GetRandomBallType()
     {
-        switch (Random.Range(0, 3))
+        return (CollectibleBall.BallType)Random.Range(0, 4);
+    }
+
+    private GameObject GetPrefab(CollectibleBall.BallType ballType)
+    {
+        switch (ballType)
         {
-            case 0: return CollectibleBall.BallColor.Blue;
-            case 1: return CollectibleBall.BallColor.Green;
-            default: return CollectibleBall.BallColor.Yellow;
+            case CollectibleBall.BallType.BeefBall: return beefBallPrefab;
+            case CollectibleBall.BallType.FishBall: return fishBallPrefab;
+            case CollectibleBall.BallType.Corn: return cornPrefab;
+            default: return broccoliPrefab;
         }
     }
 
-    public Color GetDisplayColor(CollectibleBall.BallColor ballColor)
+    public void ApplyTypeVisual(CollectibleBall ball, CollectibleBall.BallType ballType)
     {
-        switch (ballColor)
+        GameObject sourcePrefab = GetPrefab(ballType);
+        if (ball == null || sourcePrefab == null)
         {
-            case CollectibleBall.BallColor.Blue: return blue;
-            case CollectibleBall.BallColor.Green: return green;
-            default: return yellow;
+            return;
+        }
+
+        MeshFilter sourceFilter = sourcePrefab.GetComponentInChildren<MeshFilter>(true);
+        MeshFilter targetFilter = ball.GetComponentInChildren<MeshFilter>(true);
+        if (sourceFilter != null && targetFilter != null)
+        {
+            targetFilter.sharedMesh = sourceFilter.sharedMesh;
+        }
+
+        MeshRenderer sourceRenderer = sourcePrefab.GetComponentInChildren<MeshRenderer>(true);
+        MeshRenderer targetRenderer = ball.GetComponentInChildren<MeshRenderer>(true);
+        if (sourceRenderer != null && targetRenderer != null)
+        {
+            targetRenderer.sharedMaterials = sourceRenderer.sharedMaterials;
         }
     }
 
