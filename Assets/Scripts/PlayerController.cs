@@ -8,15 +8,6 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(PlayerModel))]
 public class PlayerController : MonoBehaviour
 {
-    private enum ControlScheme
-    {
-        WasdAndSpace,
-        ArrowsAndEnter
-    }
-
-    [Header("Input")]
-    [SerializeField] private ControlScheme controlScheme = ControlScheme.WasdAndSpace;
-
     [Header("Movement")]
     [SerializeField, Min(0f)] private float moveSpeed = 5f;
     [SerializeField, Min(0.1f)] private float turnRadius = 1.5f;
@@ -35,6 +26,7 @@ public class PlayerController : MonoBehaviour
     [Header("Ball Shooting")]
     [SerializeField, Min(0f)] private float ballLaunchSpeed = 15f;
     [SerializeField, Min(0f)] private float launchClearance = 0.1f;
+    [SerializeField, Min(0f)] private float attackInterval = 0.3f;
 
     private Rigidbody body;
     private PlayerModel playerModel;
@@ -45,6 +37,7 @@ public class PlayerController : MonoBehaviour
     private bool dashRequested;
     private float dashRemainingDistance;
     private float nextDashTime;
+    private float nextAttackTime;
     private Vector3 dashDirection;
     private readonly System.Collections.Generic.List<Vector3> trail =
         new System.Collections.Generic.List<Vector3>();
@@ -72,7 +65,7 @@ public class PlayerController : MonoBehaviour
     {
         Vector2 input = ReadMoveInput();
 
-        if (WasLaunchPressed())
+        if (WasLaunchPressed() && Time.time >= nextAttackTime)
         {
             launchRequested = true;
         }
@@ -82,7 +75,7 @@ public class PlayerController : MonoBehaviour
             dashRequested = true;
         }
 
-        // Move only while the keyboard or left stick is being operated.
+        // Move only while the selected movement control is being operated.
         if (input.sqrMagnitude > stickDeadZone * stickDeadZone)
         {
             desiredDirection = new Vector3(input.x, 0f, input.y).normalized;
@@ -104,7 +97,11 @@ public class PlayerController : MonoBehaviour
 
         if (launchRequested)
         {
-            LaunchFirstBall();
+            if (LaunchFirstBall())
+            {
+                nextAttackTime = Time.time + attackInterval;
+            }
+
             launchRequested = false;
         }
 
@@ -159,12 +156,12 @@ public class PlayerController : MonoBehaviour
         dashRemainingDistance -= step;
     }
 
-    private void LaunchFirstBall()
+    private bool LaunchFirstBall()
     {
         CollectibleBall ball = playerModel.RemoveFirstBall();
         if (ball == null)
         {
-            return;
+            return false;
         }
 
         Vector3 launchDirection = body.rotation * Vector3.forward;
@@ -176,6 +173,7 @@ public class PlayerController : MonoBehaviour
         launchPosition.y = ball.transform.position.y;
 
         ball.Launch(launchPosition, launchDirection, ballLaunchSpeed, playerModel);
+        return true;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -234,6 +232,23 @@ public class PlayerController : MonoBehaviour
                 continue;
             }
 
+            if (i == 0)
+            {
+                Vector3 forward = body.rotation * Vector3.forward;
+                forward.y = 0f;
+                forward.Normalize();
+                Vector3 launchReadyPosition = body.position
+                                              + forward * (playerRadius
+                                                           + ball.WorldRadius
+                                                           + launchClearance);
+                launchReadyPosition.y = ball.transform.position.y;
+                ball.transform.position = Vector3.MoveTowards(
+                    ball.transform.position,
+                    launchReadyPosition,
+                    ballFollowSpeed * Time.fixedDeltaTime);
+                continue;
+            }
+
             distanceBehind += previousRadius + ball.WorldRadius + ballGap;
 
             Vector3 target = GetTrailPosition(distanceBehind);
@@ -251,7 +266,8 @@ public class PlayerController : MonoBehaviour
         float length = 0f;
         float previousRadius = playerRadius;
 
-        for (int i = 0; i < playerModel.CollectedBalls.Count; i++)
+        // The first ball is held in front of the player and does not consume trail length.
+        for (int i = 1; i < playerModel.CollectedBalls.Count; i++)
         {
             CollectibleBall ball = playerModel.CollectedBalls[i].Ball;
             if (ball == null)
@@ -301,78 +317,43 @@ public class PlayerController : MonoBehaviour
         return trail[trail.Count - 1];
     }
 
-    private Vector2 ReadMoveInput()
+    protected virtual Vector2 ReadMoveInput()
     {
 #if ENABLE_INPUT_SYSTEM
         Vector2 input = Vector2.zero;
-
         if (Keyboard.current != null)
         {
-            if (controlScheme == ControlScheme.WasdAndSpace)
-            {
-                input.x = (Keyboard.current.dKey.isPressed ? 1f : 0f)
-                        - (Keyboard.current.aKey.isPressed ? 1f : 0f);
-                input.y = (Keyboard.current.wKey.isPressed ? 1f : 0f)
-                        - (Keyboard.current.sKey.isPressed ? 1f : 0f);
-            }
-            else
-            {
-                input.x = (Keyboard.current.rightArrowKey.isPressed ? 1f : 0f)
-                        - (Keyboard.current.leftArrowKey.isPressed ? 1f : 0f);
-                input.y = (Keyboard.current.upArrowKey.isPressed ? 1f : 0f)
-                        - (Keyboard.current.downArrowKey.isPressed ? 1f : 0f);
-            }
+            input.x = (Keyboard.current.dKey.isPressed ? 1f : 0f)
+                    - (Keyboard.current.aKey.isPressed ? 1f : 0f);
+            input.y = (Keyboard.current.wKey.isPressed ? 1f : 0f)
+                    - (Keyboard.current.sKey.isPressed ? 1f : 0f);
         }
-
         return Vector2.ClampMagnitude(input, 1f);
 #else
-        KeyCode left = controlScheme == ControlScheme.WasdAndSpace ? KeyCode.A : KeyCode.LeftArrow;
-        KeyCode right = controlScheme == ControlScheme.WasdAndSpace ? KeyCode.D : KeyCode.RightArrow;
-        KeyCode down = controlScheme == ControlScheme.WasdAndSpace ? KeyCode.S : KeyCode.DownArrow;
-        KeyCode up = controlScheme == ControlScheme.WasdAndSpace ? KeyCode.W : KeyCode.UpArrow;
-
         Vector2 input = new Vector2(
-            (Input.GetKey(right) ? 1f : 0f) - (Input.GetKey(left) ? 1f : 0f),
-            (Input.GetKey(up) ? 1f : 0f) - (Input.GetKey(down) ? 1f : 0f));
+            (Input.GetKey(KeyCode.D) ? 1f : 0f) - (Input.GetKey(KeyCode.A) ? 1f : 0f),
+            (Input.GetKey(KeyCode.W) ? 1f : 0f) - (Input.GetKey(KeyCode.S) ? 1f : 0f));
         return Vector2.ClampMagnitude(input, 1f);
 #endif
     }
 
-    private bool WasLaunchPressed()
+    protected virtual bool WasLaunchPressed()
     {
 #if ENABLE_INPUT_SYSTEM
-        if (Keyboard.current == null)
-        {
-            return false;
-        }
-
-        return controlScheme == ControlScheme.WasdAndSpace
-            ? Keyboard.current.spaceKey.wasPressedThisFrame
-            : Keyboard.current.enterKey.wasPressedThisFrame
-              || Keyboard.current.numpadEnterKey.wasPressedThisFrame;
+        return Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame;
 #else
-        return Input.GetKeyDown(
-            controlScheme == ControlScheme.WasdAndSpace ? KeyCode.Space : KeyCode.Return);
+        return Input.GetKeyDown(KeyCode.Space);
 #endif
     }
 
-    private bool WasDashPressed()
+    protected virtual bool WasDashPressed()
     {
 #if ENABLE_INPUT_SYSTEM
-        if (Keyboard.current == null)
-        {
-            return false;
-        }
-
-        return controlScheme == ControlScheme.WasdAndSpace
-            ? Keyboard.current.leftShiftKey.wasPressedThisFrame
-              || Keyboard.current.rightShiftKey.wasPressedThisFrame
-            : Keyboard.current.leftCtrlKey.wasPressedThisFrame
-              || Keyboard.current.rightCtrlKey.wasPressedThisFrame;
+        return Keyboard.current != null
+               && (Keyboard.current.leftShiftKey.wasPressedThisFrame
+                   || Keyboard.current.rightShiftKey.wasPressedThisFrame);
 #else
-        return controlScheme == ControlScheme.WasdAndSpace
-            ? Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift)
-            : Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl);
+        return Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift);
 #endif
     }
 }

@@ -1,5 +1,7 @@
+using System;
 using UnityEngine;
 using System.Collections.Generic;
+using Random = UnityEngine.Random;
 
 public class BallSpawn : MonoBehaviour
 {
@@ -19,12 +21,23 @@ public class BallSpawn : MonoBehaviour
     [SerializeField] private Color yellow = Color.yellow;
 
     private readonly Queue<CollectibleBall> ballPool = new Queue<CollectibleBall>();
+    private int spawnedBallCount;
+
 
     private void Start()
     {
+        SpawnBalls();
+    }
+
+    /// <summary>
+    /// Spawns the configured number of balls. Call this method when the game is ready.
+    /// </summary>
+    public void SpawnBalls()
+    {
         for (int i = 0; i < ballCount; i++)
         {
-            SpawnBall(i);
+            SpawnBall(spawnedBallCount);
+            spawnedBallCount++;
         }
     }
 
