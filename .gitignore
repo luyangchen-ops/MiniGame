@@ -9,6 +9,7 @@
 /[Ll]ocal[Cc]ache/
 /[Tt]emp/
 /UserSettings/
+/[Ll]ogs/
 
 # 忽略临时/自动生成的文件
 *.csproj
