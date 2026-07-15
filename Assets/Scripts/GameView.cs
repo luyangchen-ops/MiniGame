@@ -213,12 +213,13 @@ public class GameView : MonoBehaviour
             return;
         }
 
-        keyboardStatusText.text = playerSpawner.KeyboardHasJoined
-            ? "Player 1  WASD  READY"
-            : "Press SPACE to join (WASD)";
-        gamepadStatusText.text = playerSpawner.GamepadHasJoined
-            ? "Player 2  GAMEPAD  READY"
-            : "Press Xbox A to join (Gamepad)";
+        keyboardStatusText.text = "Press SPACE, ENTER or Xbox A to join";
+
+        string joinedDevices = string.Empty;
+        if (playerSpawner.KeyboardHasJoined) joinedDevices += "WASD  ";
+        if (playerSpawner.ArrowKeyboardHasJoined) joinedDevices += "ARROWS  ";
+        if (playerSpawner.GamepadHasJoined) joinedDevices += "GAMEPAD  ";
+        gamepadStatusText.text = $"Players: {playerSpawner.JoinedPlayerCount}/2  {joinedDevices}";
         startGameButton.interactable = playerSpawner.BothPlayersJoined;
     }
 

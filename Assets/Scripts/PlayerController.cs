@@ -8,6 +8,16 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(PlayerModel))]
 public class PlayerController : MonoBehaviour
 {
+    public enum KeyboardControlScheme
+    {
+        WasdSpaceShift,
+        ArrowsEnterCtrl
+    }
+
+    [Header("Keyboard Input")]
+    [SerializeField] private KeyboardControlScheme keyboardControlScheme =
+        KeyboardControlScheme.WasdSpaceShift;
+
     [Header("Movement")]
     [SerializeField, Min(0f)] private float moveSpeed = 5f;
     [SerializeField, Min(0.1f)] private float turnRadius = 1.5f;
@@ -44,6 +54,11 @@ public class PlayerController : MonoBehaviour
 
     public float DashCooldownRemaining => Mathf.Max(0f, nextDashTime - Time.time);
     public bool IsDashing => dashRemainingDistance > 0f;
+
+    public void SetKeyboardControlScheme(KeyboardControlScheme scheme)
+    {
+        keyboardControlScheme = scheme;
+    }
 
     private void Awake()
     {
@@ -323,16 +338,34 @@ public class PlayerController : MonoBehaviour
         Vector2 input = Vector2.zero;
         if (Keyboard.current != null)
         {
-            input.x = (Keyboard.current.dKey.isPressed ? 1f : 0f)
-                    - (Keyboard.current.aKey.isPressed ? 1f : 0f);
-            input.y = (Keyboard.current.wKey.isPressed ? 1f : 0f)
-                    - (Keyboard.current.sKey.isPressed ? 1f : 0f);
+            if (keyboardControlScheme == KeyboardControlScheme.WasdSpaceShift)
+            {
+                input.x = (Keyboard.current.dKey.isPressed ? 1f : 0f)
+                        - (Keyboard.current.aKey.isPressed ? 1f : 0f);
+                input.y = (Keyboard.current.wKey.isPressed ? 1f : 0f)
+                        - (Keyboard.current.sKey.isPressed ? 1f : 0f);
+            }
+            else
+            {
+                input.x = (Keyboard.current.rightArrowKey.isPressed ? 1f : 0f)
+                        - (Keyboard.current.leftArrowKey.isPressed ? 1f : 0f);
+                input.y = (Keyboard.current.upArrowKey.isPressed ? 1f : 0f)
+                        - (Keyboard.current.downArrowKey.isPressed ? 1f : 0f);
+            }
         }
         return Vector2.ClampMagnitude(input, 1f);
 #else
+        KeyCode left = keyboardControlScheme == KeyboardControlScheme.WasdSpaceShift
+            ? KeyCode.A : KeyCode.LeftArrow;
+        KeyCode right = keyboardControlScheme == KeyboardControlScheme.WasdSpaceShift
+            ? KeyCode.D : KeyCode.RightArrow;
+        KeyCode down = keyboardControlScheme == KeyboardControlScheme.WasdSpaceShift
+            ? KeyCode.S : KeyCode.DownArrow;
+        KeyCode up = keyboardControlScheme == KeyboardControlScheme.WasdSpaceShift
+            ? KeyCode.W : KeyCode.UpArrow;
         Vector2 input = new Vector2(
-            (Input.GetKey(KeyCode.D) ? 1f : 0f) - (Input.GetKey(KeyCode.A) ? 1f : 0f),
-            (Input.GetKey(KeyCode.W) ? 1f : 0f) - (Input.GetKey(KeyCode.S) ? 1f : 0f));
+            (Input.GetKey(right) ? 1f : 0f) - (Input.GetKey(left) ? 1f : 0f),
+            (Input.GetKey(up) ? 1f : 0f) - (Input.GetKey(down) ? 1f : 0f));
         return Vector2.ClampMagnitude(input, 1f);
 #endif
     }
@@ -340,20 +373,40 @@ public class PlayerController : MonoBehaviour
     protected virtual bool WasLaunchPressed()
     {
 #if ENABLE_INPUT_SYSTEM
-        return Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame;
+        if (Keyboard.current == null)
+        {
+            return false;
+        }
+
+        return keyboardControlScheme == KeyboardControlScheme.WasdSpaceShift
+            ? Keyboard.current.spaceKey.wasPressedThisFrame
+            : Keyboard.current.enterKey.wasPressedThisFrame
+              || Keyboard.current.numpadEnterKey.wasPressedThisFrame;
 #else
-        return Input.GetKeyDown(KeyCode.Space);
+        return Input.GetKeyDown(
+            keyboardControlScheme == KeyboardControlScheme.WasdSpaceShift
+                ? KeyCode.Space
+                : KeyCode.Return);
 #endif
     }
 
     protected virtual bool WasDashPressed()
     {
 #if ENABLE_INPUT_SYSTEM
-        return Keyboard.current != null
-               && (Keyboard.current.leftShiftKey.wasPressedThisFrame
-                   || Keyboard.current.rightShiftKey.wasPressedThisFrame);
+        if (Keyboard.current == null)
+        {
+            return false;
+        }
+
+        return keyboardControlScheme == KeyboardControlScheme.WasdSpaceShift
+            ? Keyboard.current.leftShiftKey.wasPressedThisFrame
+              || Keyboard.current.rightShiftKey.wasPressedThisFrame
+            : Keyboard.current.leftCtrlKey.wasPressedThisFrame
+              || Keyboard.current.rightCtrlKey.wasPressedThisFrame;
 #else
-        return Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift);
+        return keyboardControlScheme == KeyboardControlScheme.WasdSpaceShift
+            ? Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift)
+            : Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl);
 #endif
     }
 }
