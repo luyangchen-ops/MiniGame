@@ -17,11 +17,13 @@ public class CollectibleBall : MonoBehaviour
     private bool hitResolved;
     private PlayerModel chainOwner;
     private PlayerModel shooter;
+    private bool isExplosive;
 
     public BallColor Color => color;
     public float WorldRadius => worldRadius;
     public bool IsCollected { get; private set; }
     public PlayerModel ChainOwner => chainOwner;
+    public bool IsExplosive => isExplosive;
 
     public void Initialize(BallSpawn pool, BallColor newColor, Color displayColor)
     {
@@ -32,6 +34,7 @@ public class CollectibleBall : MonoBehaviour
         hitResolved = false;
         chainOwner = null;
         shooter = null;
+        isExplosive = false;
 
         foreach (Collider ballCollider in GetComponentsInChildren<Collider>(true))
         {
@@ -161,6 +164,25 @@ public class CollectibleBall : MonoBehaviour
         isLaunched = true;
     }
 
+    public void SetExplosive(bool value)
+    {
+        isExplosive = value;
+    }
+
+    public void SetColor(BallColor newColor)
+    {
+        color = newColor;
+        Color displayColor = ownerPool != null
+            ? ownerPool.GetDisplayColor(newColor)
+            : newColor == BallColor.Blue
+                ? UnityEngine.Color.blue
+                : newColor == BallColor.Green ? UnityEngine.Color.green : UnityEngine.Color.yellow;
+        foreach (Renderer ballRenderer in GetComponentsInChildren<Renderer>())
+        {
+            ballRenderer.material.color = displayColor;
+        }
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         TryHitChain(other);
@@ -222,6 +244,7 @@ public class CollectibleBall : MonoBehaviour
         hitResolved = false;
         chainOwner = null;
         shooter = null;
+        isExplosive = false;
 
         Rigidbody ballBody = GetComponentInChildren<Rigidbody>(true);
         if (ballBody != null)

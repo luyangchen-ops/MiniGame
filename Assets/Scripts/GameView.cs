@@ -205,7 +205,7 @@ public class GameView : MonoBehaviour
 
         if (ballSpawn != null)
         {
-            ballSpawn.SpawnBalls();
+            ballSpawn.InitializeSpawns();
         }
 
         ShowPage(hudPage);

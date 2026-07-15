@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AgentProjectSkillsSettings">
+    <option name="globalSkillsBannerDismissed" value="true" />
+  </component>
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
@@ -12,7 +15,15 @@
   <component name="ChangeListManager">
     <list default="true" id="1ecfb919-4a46-4eac-b802-c218dfa358c1" name="更改" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.MiniGame/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.MiniGame/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/Test.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Test.unity" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/BallSpawn.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/BallSpawn.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/CollectibleBall.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/CollectibleBall.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/GameView.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/GameView.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Model/PlayerModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Model/PlayerModel.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/PlayerController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/PlayerController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/SpecialItem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/SpecialItem.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/obj/Debug/Assembly-CSharp-Editor.csproj.AssemblyReference.cache" beforeDir="false" afterPath="$PROJECT_DIR$/obj/Debug/Assembly-CSharp-Editor.csproj.AssemblyReference.cache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/obj/Debug/Assembly-CSharp.csproj.AssemblyReference.cache" beforeDir="false" afterPath="$PROJECT_DIR$/obj/Debug/Assembly-CSharp.csproj.AssemblyReference.cache" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,61 +46,61 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0" />
-      <entry key="MS500" value="1.0" />
-      <entry key="S2" value="1.0000000097652608" />
-      <entry key="S5" value="1.0015255938631156" />
-      <entry key="S10" value="1.1248358755943741" />
-      <entry key="S30" value="4.616949757801162" />
-      <entry key="S60" value="10.412655424209564" />
-      <entry key="M2" value="16.894748866709932" />
-      <entry key="M5" value="27.93844049019298" />
-      <entry key="M10" value="43.70380844736654" />
-      <entry key="M15" value="55.592144849093195" />
-      <entry key="M30" value="79.35457430935634" />
-      <entry key="H1" value="123.95190405815376" />
-      <entry key="H2" value="199.64849361367266" />
-      <entry key="H4" value="279.0162905712282" />
-      <entry key="D1" value="387.56832403483475" />
-      <entry key="W1" value="411.7735451315226" />
+      <entry key="MS100" value="1.0004524397682968" />
+      <entry key="MS500" value="1.2378572227179683" />
+      <entry key="S2" value="2.5389314126614253" />
+      <entry key="S5" value="4.688507108530285" />
+      <entry key="S10" value="7.323560752356511" />
+      <entry key="S30" value="13.772042885249652" />
+      <entry key="S60" value="17.97994305970945" />
+      <entry key="M2" value="21.538104289255724" />
+      <entry key="M5" value="27.79536017576519" />
+      <entry key="M10" value="37.89625283144333" />
+      <entry key="M15" value="49.76413538092152" />
+      <entry key="M30" value="84.99634865610746" />
+      <entry key="H1" value="144.75210068421364" />
+      <entry key="H2" value="238.73906676306606" />
+      <entry key="H4" value="348.13236177508855" />
+      <entry key="D1" value="519.2534520068679" />
+      <entry key="W1" value="560.6545891847401" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
       <entry key="MS500" value="0.0" />
       <entry key="S2" value="0.0" />
       <entry key="S5" value="0.0" />
-      <entry key="S10" value="1.7916182072007061E-287" />
-      <entry key="S30" value="2.61666719126612E-96" />
-      <entry key="S60" value="1.6176115699592775E-48" />
-      <entry key="M2" value="1.2718535961183838E-24" />
-      <entry key="M5" value="2.765507552884025E-10" />
-      <entry key="M10" value="1.6629815251180657E-5" />
-      <entry key="M15" value="6.515157959862615E-4" />
-      <entry key="M30" value="0.025524807462276" />
-      <entry key="H1" value="0.15976485052187187" />
-      <entry key="H2" value="0.3997059550743166" />
-      <entry key="H4" value="0.6322230263714832" />
-      <entry key="D1" value="0.926428097477636" />
-      <entry key="W1" value="0.98914239638795" />
+      <entry key="S10" value="0.0" />
+      <entry key="S30" value="4.910221278501078E-155" />
+      <entry key="S60" value="7.00729710979993E-78" />
+      <entry key="M2" value="2.6471299759928382E-39" />
+      <entry key="M5" value="3.7077471214027553E-16" />
+      <entry key="M10" value="1.9255511214721678E-8" />
+      <entry key="M15" value="7.184061400126324E-6" />
+      <entry key="M30" value="0.0026803099447874077" />
+      <entry key="H1" value="0.05177170988858132" />
+      <entry key="H2" value="0.22753397524014102" />
+      <entry key="H4" value="0.4770052151079074" />
+      <entry key="D1" value="0.8839353883045914" />
+      <entry key="W1" value="0.9825299298624285" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.9726549474122855" />
-      <entry key="MS500" value="0.9944701686732144" />
-      <entry key="S2" value="0.9986146758507167" />
-      <entry key="S5" value="1.0009702615431877" />
-      <entry key="S10" value="1.1245186920760681" />
-      <entry key="S30" value="4.616456837837363" />
-      <entry key="S60" value="10.41207796163213" />
-      <entry key="M2" value="16.89427332265111" />
-      <entry key="M5" value="27.938127198125724" />
-      <entry key="M10" value="43.703581079610316" />
-      <entry key="M15" value="55.59258778354736" />
-      <entry key="M30" value="79.37991669656395" />
-      <entry key="H1" value="124.11144195466177" />
-      <entry key="H2" value="200.04796344368404" />
-      <entry key="H4" value="279.6483333907471" />
-      <entry key="D1" value="388.49470843794955" />
-      <entry key="W1" value="412.76268085966933" />
+      <entry key="MS100" value="0.9730919755061993" />
+      <entry key="MS500" value="1.2307717581461588" />
+      <entry key="S2" value="2.5352942869491812" />
+      <entry key="S5" value="4.6857495308081365" />
+      <entry key="S10" value="7.321328966103636" />
+      <entry key="S30" value="13.77054958246031" />
+      <entry key="S60" value="17.978945094015835" />
+      <entry key="M2" value="21.537498837605803" />
+      <entry key="M5" value="27.7950440413242" />
+      <entry key="M10" value="37.89603486171223" />
+      <entry key="M15" value="49.763949945699714" />
+      <entry key="M30" value="84.99885936150372" />
+      <entry key="H1" value="144.80369549864167" />
+      <entry key="H2" value="238.966404314862" />
+      <entry key="H4" value="348.60919686441747" />
+      <entry key="D1" value="520.1373395138619" />
+      <entry key="W1" value="561.6371115934671" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -118,6 +129,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "com.intellij.ml.llm.agents.skills.settings",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -167,7 +179,7 @@
       <option name="presentableId" value="Default" />
       <updated>1784029647811</updated>
       <workItem from="1784029649788" duration="35000" />
-      <workItem from="1784080721222" duration="10104000" />
+      <workItem from="1784080721222" duration="15831000" />
     </task>
     <servers />
   </component>
@@ -201,5 +213,9 @@
         </breakpoint>
       </breakpoints>
     </breakpoint-manager>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>

@@ -6,11 +6,24 @@ public class SpecialItem : MonoBehaviour
     public enum EffectType
     {
         SpeedBoost,
-        Shield,
-        ExtraBall
+        AimGuide,
+        Suction,
+        ExplosiveBall,
+        Infection,
+        Slow
     }
 
     [SerializeField] private EffectType effectType;
+
+    [Header("Timed Effect Settings")]
+    [SerializeField, Min(0.01f)] private float speedBoostMultiplier = 1.75f;
+    [SerializeField, Min(0f)] private float speedBoostDuration = 5f;
+    [SerializeField, Min(0f)] private float aimGuideDuration = 6f;
+    [SerializeField, Min(0.1f)] private float aimGuideLength = 12f;
+    [SerializeField, Min(0.1f)] private float suctionRadius = 4f;
+    [SerializeField, Min(0f)] private float suctionDuration = 6f;
+    [SerializeField, Range(0.01f, 1f)] private float slowMultiplier = 0.5f;
+    [SerializeField, Min(0f)] private float slowDuration = 5f;
 
     private bool isCollected;
 
@@ -62,14 +75,42 @@ public class SpecialItem : MonoBehaviour
 
     private void ApplyEffect(PlayerModel player)
     {
-        // Effect implementations are intentionally left as extension points.
+        PlayerController controller = player.GetComponent<PlayerController>();
+
         switch (effectType)
         {
             case EffectType.SpeedBoost:
+                if (controller != null)
+                {
+                    controller.ApplySpeedBoost(speedBoostMultiplier, speedBoostDuration);
+                }
                 break;
-            case EffectType.Shield:
+            case EffectType.AimGuide:
+                if (controller != null)
+                {
+                    controller.ApplyAimGuide(aimGuideDuration, aimGuideLength);
+                }
                 break;
-            case EffectType.ExtraBall:
+            case EffectType.Suction:
+                if (controller != null)
+                {
+                    controller.ApplySuction(suctionRadius, suctionDuration);
+                }
+                break;
+            case EffectType.ExplosiveBall:
+                if (controller != null)
+                {
+                    controller.ArmExplosiveBall();
+                }
+                break;
+            case EffectType.Infection:
+                player.InfectBackHalf();
+                break;
+            case EffectType.Slow:
+                if (controller != null)
+                {
+                    controller.ApplySlow(slowMultiplier, slowDuration);
+                }
                 break;
         }
     }

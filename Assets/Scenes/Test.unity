@@ -2884,10 +2884,19 @@ MonoBehaviour:
   ballPrefab: {fileID: 1917115418823056025, guid: 915abfaa5e78a4d48907e4b5fafe57e6,
     type: 3}
   ballCount: 40
+<<<<<<< Updated upstream
   ballScale: 0.5
   specialItemPrefab: {fileID: 0}
   specialItemCount: 0
+=======
+  ballScale: 0.3
+  ballSpawnInterval: 60
+  specialItemPrefab: {fileID: 8387687931667497923, guid: d082494ce88062f4c969698a1f04f999,
+    type: 3}
+  specialItemCount: 2
+>>>>>>> Stashed changes
   specialItemScale: 1
+  specialItemSpawnInterval: 10
   xRange: {x: -15, y: 15}
   zRange: {x: -15, y: 15}
   spawnHeight: 0.5

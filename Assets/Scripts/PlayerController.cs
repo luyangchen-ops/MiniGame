@@ -38,6 +38,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField, Min(0f)] private float launchClearance = 0.1f;
     [SerializeField, Min(0f)] private float attackInterval = 0.3f;
 
+    [Header("Special Effect Visuals")]
+    [SerializeField] private Color aimGuideColor = new Color(1f, 1f, 1f, 0.8f);
+    [SerializeField, Min(0.001f)] private float aimGuideWidth = 0.04f;
+
     private Rigidbody body;
     private PlayerModel playerModel;
     private Vector3 desiredDirection;
@@ -49,6 +53,16 @@ public class PlayerController : MonoBehaviour
     private float nextDashTime;
     private float nextAttackTime;
     private Vector3 dashDirection;
+    private float speedBoostMultiplier = 1f;
+    private float speedBoostEndTime;
+    private float slowMultiplier = 1f;
+    private float slowEndTime;
+    private float suctionRadius;
+    private float suctionEndTime;
+    private float aimGuideEndTime;
+    private float aimGuideLength;
+    private bool explosiveBallArmed;
+    private LineRenderer aimGuide;
     private readonly System.Collections.Generic.List<Vector3> trail =
         new System.Collections.Generic.List<Vector3>();
 
@@ -78,6 +92,7 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        UpdateTimedEffects();
         Vector2 input = ReadMoveInput();
 
         if (WasLaunchPressed() && Time.time >= nextAttackTime)
@@ -127,7 +142,7 @@ public class PlayerController : MonoBehaviour
         else if (movementAmount > 0f)
         {
             Quaternion targetRotation = Quaternion.LookRotation(desiredDirection, Vector3.up);
-            float currentSpeed = moveSpeed * movementAmount;
+            float currentSpeed = moveSpeed * GetSpeedMultiplier() * movementAmount;
             float angularSpeed = currentSpeed / Mathf.Max(turnRadius, 0.1f) * Mathf.Rad2Deg;
             Quaternion nextRotation = Quaternion.RotateTowards(
                 body.rotation,
@@ -179,6 +194,12 @@ public class PlayerController : MonoBehaviour
             return false;
         }
 
+        if (explosiveBallArmed)
+        {
+            ball.SetExplosive(true);
+            explosiveBallArmed = false;
+        }
+
         Vector3 launchDirection = body.rotation * Vector3.forward;
         launchDirection.y = 0f;
         launchDirection.Normalize();
@@ -212,6 +233,92 @@ public class PlayerController : MonoBehaviour
         playerModel.AddBall(ball);
         ball.RefreshWorldRadius();
         ball.transform.SetParent(null, true);
+    }
+
+    public void ApplySpeedBoost(float multiplier, float duration)
+    {
+        speedBoostMultiplier = Mathf.Max(1f, multiplier);
+        speedBoostEndTime = Mathf.Max(speedBoostEndTime, Time.time + duration);
+    }
+
+    public void ApplySlow(float multiplier, float duration)
+    {
+        slowMultiplier = Mathf.Clamp(multiplier, 0.01f, 1f);
+        slowEndTime = Mathf.Max(slowEndTime, Time.time + duration);
+    }
+
+    public void ApplySuction(float radius, float duration)
+    {
+        suctionRadius = Mathf.Max(suctionRadius, radius);
+        suctionEndTime = Mathf.Max(suctionEndTime, Time.time + duration);
+    }
+
+    public void ApplyAimGuide(float duration, float length)
+    {
+        aimGuideLength = Mathf.Max(0.1f, length);
+        aimGuideEndTime = Mathf.Max(aimGuideEndTime, Time.time + duration);
+        EnsureAimGuide();
+    }
+
+    public void ArmExplosiveBall()
+    {
+        explosiveBallArmed = true;
+    }
+
+    private float GetSpeedMultiplier()
+    {
+        float boost = Time.time < speedBoostEndTime ? speedBoostMultiplier : 1f;
+        float slow = Time.time < slowEndTime ? slowMultiplier : 1f;
+        return boost * slow;
+    }
+
+    private void UpdateTimedEffects()
+    {
+        if (Time.time < suctionEndTime)
+        {
+            Collider[] nearby = Physics.OverlapSphere(transform.position, suctionRadius);
+            foreach (Collider nearbyCollider in nearby)
+            {
+                TryCollectBall(nearbyCollider);
+            }
+        }
+        else
+        {
+            suctionRadius = 0f;
+        }
+
+        bool showAimGuide = Time.time < aimGuideEndTime;
+        if (aimGuide != null)
+        {
+            aimGuide.enabled = showAimGuide;
+            if (showAimGuide)
+            {
+                Vector3 start = body.position;
+                Vector3 forward = body.rotation * Vector3.forward;
+                aimGuide.SetPosition(0, start);
+                aimGuide.SetPosition(1, start + forward * aimGuideLength);
+            }
+        }
+    }
+
+    private void EnsureAimGuide()
+    {
+        if (aimGuide != null)
+        {
+            aimGuide.enabled = true;
+            return;
+        }
+
+        GameObject guideObject = new GameObject("AimGuide");
+        guideObject.transform.SetParent(transform, false);
+        aimGuide = guideObject.AddComponent<LineRenderer>();
+        aimGuide.useWorldSpace = true;
+        aimGuide.positionCount = 2;
+        aimGuide.startWidth = aimGuideWidth;
+        aimGuide.endWidth = aimGuideWidth;
+        aimGuide.startColor = aimGuideColor;
+        aimGuide.endColor = aimGuideColor;
+        aimGuide.material = new Material(Shader.Find("Sprites/Default"));
     }
 
     private void RecordTrailPoint(Vector3 position)

@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 using Random = UnityEngine.Random;
 
@@ -8,11 +9,13 @@ public class BallSpawn : MonoBehaviour
     [SerializeField] private GameObject ballPrefab;
     [SerializeField, Min(0)] private int ballCount = 20;
     [SerializeField, Min(0.01f)] private float ballScale = 1f;
+    [SerializeField, Min(0.1f)] private float ballSpawnInterval = 60f;
 
     [Header("Special Items")]
     [SerializeField] private GameObject specialItemPrefab;
     [SerializeField, Min(0)] private int specialItemCount = 3;
     [SerializeField, Min(0.01f)] private float specialItemScale = 1f;
+    [SerializeField, Min(0.1f)] private float specialItemSpawnInterval = 20f;
 
     [Header("Spawn Area (relative to this object)")]
     [SerializeField] private Vector2 xRange = new Vector2(-10f, 10f);
@@ -26,12 +29,25 @@ public class BallSpawn : MonoBehaviour
 
     private readonly Queue<CollectibleBall> ballPool = new Queue<CollectibleBall>();
     private int spawnedBallCount;
+    private int spawnedSpecialItemCount;
+    private bool spawningStarted;
 
-
-    private void Start()
+    /// <summary>
+    /// Creates the initial balls and special items, then starts their periodic spawning.
+    /// Safe to call more than once; only the first call takes effect.
+    /// </summary>
+    public void InitializeSpawns()
     {
+        if (spawningStarted)
+        {
+            return;
+        }
+
+        spawningStarted = true;
         SpawnBalls();
         SpawnSpecialItems();
+        StartCoroutine(SpawnBallPeriodically());
+        StartCoroutine(SpawnSpecialItemPeriodically());
     }
 
     /// <summary>
@@ -80,7 +96,28 @@ public class BallSpawn : MonoBehaviour
     {
         for (int i = 0; i < specialItemCount; i++)
         {
-            SpawnSpecialItem(i);
+            SpawnSpecialItem(spawnedSpecialItemCount);
+            spawnedSpecialItemCount++;
+        }
+    }
+
+    private IEnumerator SpawnBallPeriodically()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(ballSpawnInterval);
+            SpawnBall(spawnedBallCount);
+            spawnedBallCount++;
+        }
+    }
+
+    private IEnumerator SpawnSpecialItemPeriodically()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(specialItemSpawnInterval);
+            SpawnSpecialItem(spawnedSpecialItemCount);
+            spawnedSpecialItemCount++;
         }
     }
 
@@ -179,7 +216,7 @@ public class BallSpawn : MonoBehaviour
         }
     }
 
-    private Color GetDisplayColor(CollectibleBall.BallColor ballColor)
+    public Color GetDisplayColor(CollectibleBall.BallColor ballColor)
     {
         switch (ballColor)
         {

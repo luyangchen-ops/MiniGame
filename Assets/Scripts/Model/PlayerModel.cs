@@ -10,7 +10,7 @@ public class PlayerModel : MonoBehaviour
         [SerializeField] private CollectibleBall.BallColor color;
         [SerializeField] private CollectibleBall ball;
 
-        public CollectibleBall.BallColor Color => color;
+        public CollectibleBall.BallColor Color => ball != null ? ball.Color : color;
         public CollectibleBall Ball => ball;
 
         public CollectedBallData(CollectibleBall collectedBall)
@@ -90,6 +90,11 @@ public class PlayerModel : MonoBehaviour
 
     private void ResolveInsertedBall(int insertedIndex, CollectibleBall projectile)
     {
+        if (projectile.IsExplosive)
+        {
+            ResolveExplosion(insertedIndex);
+            return;
+        }
 
         CollectibleBall.BallColor matchedColor = projectile.Color;
         int first = insertedIndex;
@@ -119,6 +124,48 @@ public class PlayerModel : MonoBehaviour
 
         collectedBalls.RemoveRange(first, matchCount);
         TriggerEliminationFeedback(matchCount);
+        foreach (CollectibleBall ball in removedBalls)
+        {
+            if (ball != null)
+            {
+                ball.ReturnToPool();
+            }
+        }
+    }
+
+    public void InfectBackHalf()
+    {
+        if (collectedBalls.Count == 0)
+        {
+            return;
+        }
+
+        CollectibleBall.BallColor infectedColor =
+            (CollectibleBall.BallColor)UnityEngine.Random.Range(0, 3);
+        int firstInfectedIndex = collectedBalls.Count / 2;
+        for (int i = firstInfectedIndex; i < collectedBalls.Count; i++)
+        {
+            CollectibleBall ball = collectedBalls[i].Ball;
+            if (ball != null)
+            {
+                ball.SetColor(infectedColor);
+            }
+        }
+    }
+
+    private void ResolveExplosion(int centerIndex)
+    {
+        int first = Mathf.Max(0, centerIndex - 2);
+        int last = Mathf.Min(collectedBalls.Count - 1, centerIndex + 2);
+        int removeCount = last - first + 1;
+        List<CollectibleBall> removedBalls = new List<CollectibleBall>(removeCount);
+        for (int i = first; i <= last; i++)
+        {
+            removedBalls.Add(collectedBalls[i].Ball);
+        }
+
+        collectedBalls.RemoveRange(first, removeCount);
+        TriggerEliminationFeedback(removeCount);
         foreach (CollectibleBall ball in removedBalls)
         {
             if (ball != null)
