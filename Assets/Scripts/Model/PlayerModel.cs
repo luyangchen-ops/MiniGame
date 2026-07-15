@@ -25,6 +25,11 @@ public class PlayerModel : MonoBehaviour
     public IReadOnlyList<CollectedBallData> CollectedBalls => collectedBalls;
     public int BallCount => collectedBalls.Count;
 
+    // Temporary scoring rule: one point for each currently collected ball.
+    // Other systems should read Score instead of BallCount so the scoring
+    // implementation can be replaced later without changing its consumers.
+    public int Score => BallCount;
+
     public void AddBall(CollectibleBall ball)
     {
         if (ball == null)

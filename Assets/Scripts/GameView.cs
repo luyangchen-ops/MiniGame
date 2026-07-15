@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class GameView : MonoBehaviour
@@ -13,6 +14,7 @@ public class GameView : MonoBehaviour
     [SerializeField] private GameObject mainPage;
     [SerializeField] private GameObject joinPage;
     [SerializeField] private GameObject hudPage;
+    [SerializeField] private GameObject resultPage;
 
     [Header("Main Page")]
     [SerializeField] private Button battleModeButton;
@@ -28,6 +30,13 @@ public class GameView : MonoBehaviour
     [SerializeField] private Text playerOneCooldownText;
     [SerializeField] private Text playerTwoCooldownText;
 
+    [Header("Result Page")]
+    [SerializeField] private Text playerOneScoreText;
+    [SerializeField] private Text playerTwoScoreText;
+    [SerializeField] private Text winnerText;
+    [SerializeField] private Button playAgainButton;
+    [SerializeField] private Button returnToMenuButton;
+
     [Header("Countdown Warning")]
     [SerializeField, Min(0f)] private float redWarningTime = 30f;
     [SerializeField, Min(0f)] private float urgentWarningTime = 10f;
@@ -40,6 +49,7 @@ public class GameView : MonoBehaviour
     private Color countdownDefaultColor;
     private int countdownDefaultFontSize;
     private Vector2 countdownDefaultPosition;
+    private static PlayerSpawner.PlayerJoinType[] savedRestartJoinOrder;
 
     public bool IsPlaying => isPlaying;
     public float RemainingTime => remainingTime;
@@ -83,6 +93,16 @@ public class GameView : MonoBehaviour
             startGameButton.onClick.AddListener(StartGame);
         }
 
+        if (playAgainButton != null)
+        {
+            playAgainButton.onClick.AddListener(PlayAgain);
+        }
+
+        if (returnToMenuButton != null)
+        {
+            returnToMenuButton.onClick.AddListener(ReturnToMainMenu);
+        }
+
         if (playerSpawner != null)
         {
             playerSpawner.PlayerSpawned += OnPlayerSpawned;
@@ -106,10 +126,34 @@ public class GameView : MonoBehaviour
             startGameButton.onClick.RemoveListener(StartGame);
         }
 
+        if (playAgainButton != null)
+        {
+            playAgainButton.onClick.RemoveListener(PlayAgain);
+        }
+
+        if (returnToMenuButton != null)
+        {
+            returnToMenuButton.onClick.RemoveListener(ReturnToMainMenu);
+        }
+
         if (playerSpawner != null)
         {
             playerSpawner.PlayerSpawned -= OnPlayerSpawned;
         }
+    }
+
+    private void Start()
+    {
+        if (savedRestartJoinOrder == null || savedRestartJoinOrder.Length < 2
+            || playerSpawner == null)
+        {
+            return;
+        }
+
+        PlayerSpawner.PlayerJoinType[] joinOrder = savedRestartJoinOrder;
+        savedRestartJoinOrder = null;
+        playerSpawner.SpawnSavedPlayers(joinOrder);
+        StartGame();
     }
 
     private void Update()
@@ -177,6 +221,27 @@ public class GameView : MonoBehaviour
 #endif
     }
 
+    public void PlayAgain()
+    {
+        if (playerSpawner == null || playerSpawner.JoinOrder.Count < 2)
+        {
+            return;
+        }
+
+        savedRestartJoinOrder = new[]
+        {
+            playerSpawner.JoinOrder[0],
+            playerSpawner.JoinOrder[1]
+        };
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    public void ReturnToMainMenu()
+    {
+        savedRestartJoinOrder = null;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
     private void OnPlayerSpawned(PlayerController player)
     {
         if (player != null && !players.Contains(player))
@@ -203,6 +268,43 @@ public class GameView : MonoBehaviour
             countdownText.text = "00:00";
             countdownText.rectTransform.anchoredPosition = countdownDefaultPosition;
         }
+
+        RefreshResultPage();
+        ShowPage(resultPage);
+    }
+
+    private void RefreshResultPage()
+    {
+        int playerOneScore = GetPlayerScore(0);
+        int playerTwoScore = GetPlayerScore(1);
+
+        if (playerOneScoreText != null)
+        {
+            playerOneScoreText.text = $"Player 1 Score: {playerOneScore}";
+        }
+
+        if (playerTwoScoreText != null)
+        {
+            playerTwoScoreText.text = $"Player 2 Score: {playerTwoScore}";
+        }
+
+        if (winnerText != null)
+        {
+            winnerText.text = playerOneScore == playerTwoScore
+                ? "DRAW"
+                : playerOneScore > playerTwoScore ? "PLAYER 1 WINS" : "PLAYER 2 WINS";
+        }
+    }
+
+    private int GetPlayerScore(int index)
+    {
+        if (index >= players.Count || players[index] == null)
+        {
+            return 0;
+        }
+
+        PlayerModel model = players[index].GetComponent<PlayerModel>();
+        return model != null ? model.Score : 0;
     }
 
     private void RefreshJoinPage()
@@ -301,5 +403,6 @@ public class GameView : MonoBehaviour
         if (mainPage != null) mainPage.SetActive(page == mainPage);
         if (joinPage != null) joinPage.SetActive(page == joinPage);
         if (hudPage != null) hudPage.SetActive(page == hudPage);
+        if (resultPage != null) resultPage.SetActive(page == resultPage);
     }
 }

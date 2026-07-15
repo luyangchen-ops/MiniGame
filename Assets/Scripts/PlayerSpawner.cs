@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 #if ENABLE_INPUT_SYSTEM
@@ -7,6 +8,13 @@ using UnityEngine.InputSystem;
 
 public class PlayerSpawner : MonoBehaviour
 {
+    public enum PlayerJoinType
+    {
+        Wasd,
+        Arrows,
+        Gamepad
+    }
+
     [Header("Player Prefabs")]
     [SerializeField] private GameObject wasdPlayerPrefab;
     [SerializeField] private GameObject gamepadPlayerPrefab;
@@ -19,6 +27,7 @@ public class PlayerSpawner : MonoBehaviour
     private bool arrowKeyboardHasJoined;
     private bool gamepadHasJoined;
     private int nextSpawnIndex;
+    private readonly List<PlayerJoinType> joinOrder = new List<PlayerJoinType>(2);
 
     public bool KeyboardHasJoined => keyboardHasJoined;
     public bool ArrowKeyboardHasJoined => arrowKeyboardHasJoined;
@@ -27,6 +36,7 @@ public class PlayerSpawner : MonoBehaviour
                                     + (arrowKeyboardHasJoined ? 1 : 0)
                                     + (gamepadHasJoined ? 1 : 0);
     public bool BothPlayersJoined => JoinedPlayerCount >= 2;
+    public IReadOnlyList<PlayerJoinType> JoinOrder => joinOrder;
     public event Action<PlayerController> PlayerSpawned;
 
     private void Update()
@@ -41,7 +51,8 @@ public class PlayerSpawner : MonoBehaviour
             keyboardHasJoined = TrySpawn(
                 wasdPlayerPrefab,
                 "WASD",
-                PlayerController.KeyboardControlScheme.WasdSpaceShift);
+                PlayerController.KeyboardControlScheme.WasdSpaceShift,
+                PlayerJoinType.Wasd);
         }
 
         if (!BothPlayersJoined && !arrowKeyboardHasJoined && WasArrowKeyboardJoinPressed())
@@ -49,19 +60,25 @@ public class PlayerSpawner : MonoBehaviour
             arrowKeyboardHasJoined = TrySpawn(
                 wasdPlayerPrefab,
                 "Arrow Keyboard",
-                PlayerController.KeyboardControlScheme.ArrowsEnterCtrl);
+                PlayerController.KeyboardControlScheme.ArrowsEnterCtrl,
+                PlayerJoinType.Arrows);
         }
 
         if (!BothPlayersJoined && !gamepadHasJoined && WasGamepadJoinPressed())
         {
-            gamepadHasJoined = TrySpawn(gamepadPlayerPrefab, "Gamepad", null);
+            gamepadHasJoined = TrySpawn(
+                gamepadPlayerPrefab,
+                "Gamepad",
+                null,
+                PlayerJoinType.Gamepad);
         }
     }
 
     private bool TrySpawn(
         GameObject playerPrefab,
         string deviceName,
-        PlayerController.KeyboardControlScheme? keyboardScheme)
+        PlayerController.KeyboardControlScheme? keyboardScheme,
+        PlayerJoinType joinType)
     {
         Transform spawnPoint = nextSpawnIndex == 0 ? firstSpawnPoint : secondSpawnPoint;
 
@@ -86,8 +103,46 @@ public class PlayerSpawner : MonoBehaviour
         }
 
         nextSpawnIndex++;
+        joinOrder.Add(joinType);
         PlayerSpawned?.Invoke(controller);
         return true;
+    }
+
+    public void SpawnSavedPlayers(IReadOnlyList<PlayerJoinType> savedJoinOrder)
+    {
+        if (savedJoinOrder == null)
+        {
+            return;
+        }
+
+        foreach (PlayerJoinType joinType in savedJoinOrder)
+        {
+            if (BothPlayersJoined)
+            {
+                break;
+            }
+
+            switch (joinType)
+            {
+                case PlayerJoinType.Wasd:
+                    keyboardHasJoined = TrySpawn(
+                        wasdPlayerPrefab,
+                        "WASD",
+                        PlayerController.KeyboardControlScheme.WasdSpaceShift,
+                        joinType);
+                    break;
+                case PlayerJoinType.Arrows:
+                    arrowKeyboardHasJoined = TrySpawn(
+                        wasdPlayerPrefab,
+                        "Arrow Keyboard",
+                        PlayerController.KeyboardControlScheme.ArrowsEnterCtrl,
+                        joinType);
+                    break;
+                case PlayerJoinType.Gamepad:
+                    gamepadHasJoined = TrySpawn(gamepadPlayerPrefab, "Gamepad", null, joinType);
+                    break;
+            }
+        }
     }
 
     private static bool WasKeyboardJoinPressed()
