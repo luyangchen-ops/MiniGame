@@ -1,0 +1,30 @@
+/[Lo]gs/
+/[Ob]ject/
+/[Bb]uild/
+/[Bb]uilds/
+/Autorun/
+/[Cc]ache/
+/%userprofile%/
+/[Ll]ibrary/
+/[Ll]ocal[Cc]ache/
+/[Tt]emp/
+/UserSettings/
+
+# 忽略临时/自动生成的文件
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.opendb
+*.VC.db
+
+# 操作系统文件
+.DS_Store
+Thumbs.db
