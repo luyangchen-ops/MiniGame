@@ -22,9 +22,20 @@ public class CameraController : MonoBehaviour
     [SerializeField, Min(0f)] private float distancePadding = 2f;
     [SerializeField, Min(0.01f)] private float zoomSmoothTime = 0.3f;
 
+    [Header("Elimination Shake")]
+    [SerializeField, Min(0f)] private float baseShakeStrength = 0.08f;
+    [SerializeField, Min(0f)] private float strengthPerExtraBall = 0.05f;
+    [SerializeField, Min(0f)] private float baseShakeDuration = 0.12f;
+    [SerializeField, Min(0f)] private float durationPerExtraBall = 0.025f;
+    [SerializeField, Min(0f)] private float maximumShakeStrength = 0.4f;
+
     private Camera controlledCamera;
     private Vector3 followVelocity;
     private float zoomVelocity;
+    private float shakeRemainingTime;
+    private float shakeDuration;
+    private float shakeStrength;
+    private Vector3 previousShakeOffset;
 
     private void Awake()
     {
@@ -33,9 +44,14 @@ public class CameraController : MonoBehaviour
 
     private void LateUpdate()
     {
+        // Remove last frame's additive shake before calculating camera follow.
+        transform.position -= previousShakeOffset;
+        previousShakeOffset = Vector3.zero;
+
         FindMissingPlayers();
         if (playerOne == null || playerTwo == null)
         {
+            ApplyShake();
             return;
         }
 
@@ -69,6 +85,7 @@ public class CameraController : MonoBehaviour
                 targetPosition,
                 ref followVelocity,
                 followSmoothTime);
+            ApplyShake();
             return;
         }
 
@@ -84,6 +101,43 @@ public class CameraController : MonoBehaviour
             ref zoomVelocity,
             zoomSmoothTime);
         transform.position = nextPosition;
+        ApplyShake();
+    }
+
+    public void ShakeForElimination(int eliminatedBallCount)
+    {
+        if (eliminatedBallCount <= 0)
+        {
+            return;
+        }
+
+        int extraBallCount = Mathf.Max(0, eliminatedBallCount - 3);
+        float requestedStrength = Mathf.Min(
+            baseShakeStrength + extraBallCount * strengthPerExtraBall,
+            maximumShakeStrength);
+        float requestedDuration = baseShakeDuration + extraBallCount * durationPerExtraBall;
+
+        // A stronger overlapping elimination should not be weakened by an active shake.
+        shakeStrength = Mathf.Max(shakeStrength, requestedStrength);
+        shakeDuration = Mathf.Max(shakeDuration, requestedDuration);
+        shakeRemainingTime = Mathf.Max(shakeRemainingTime, requestedDuration);
+    }
+
+    private void ApplyShake()
+    {
+        if (shakeRemainingTime <= 0f || shakeDuration <= 0f)
+        {
+            shakeRemainingTime = 0f;
+            shakeDuration = 0f;
+            shakeStrength = 0f;
+            return;
+        }
+
+        shakeRemainingTime = Mathf.Max(0f, shakeRemainingTime - Time.unscaledDeltaTime);
+        float fade = shakeRemainingTime / shakeDuration;
+        Vector2 randomOffset = Random.insideUnitCircle * shakeStrength * fade;
+        previousShakeOffset = new Vector3(randomOffset.x, 0f, randomOffset.y);
+        transform.position += previousShakeOffset;
     }
 
     private void FindMissingPlayers()

@@ -118,12 +118,22 @@ public class PlayerModel : MonoBehaviour
         }
 
         collectedBalls.RemoveRange(first, matchCount);
+        TriggerEliminationFeedback(matchCount);
         foreach (CollectibleBall ball in removedBalls)
         {
             if (ball != null)
             {
                 ball.ReturnToPool();
             }
+        }
+    }
+
+    private static void TriggerEliminationFeedback(int eliminatedBallCount)
+    {
+        CameraController cameraController = FindObjectOfType<CameraController>();
+        if (cameraController != null)
+        {
+            cameraController.ShakeForElimination(eliminatedBallCount);
         }
     }
 }

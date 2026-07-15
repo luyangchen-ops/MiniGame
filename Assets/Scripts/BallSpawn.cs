@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using System.Collections.Generic;
 using Random = UnityEngine.Random;
@@ -9,6 +8,11 @@ public class BallSpawn : MonoBehaviour
     [SerializeField] private GameObject ballPrefab;
     [SerializeField, Min(0)] private int ballCount = 20;
     [SerializeField, Min(0.01f)] private float ballScale = 1f;
+
+    [Header("Special Items")]
+    [SerializeField] private GameObject specialItemPrefab;
+    [SerializeField, Min(0)] private int specialItemCount = 3;
+    [SerializeField, Min(0.01f)] private float specialItemScale = 1f;
 
     [Header("Spawn Area (relative to this object)")]
     [SerializeField] private Vector2 xRange = new Vector2(-10f, 10f);
@@ -27,6 +31,7 @@ public class BallSpawn : MonoBehaviour
     private void Start()
     {
         SpawnBalls();
+        SpawnSpecialItems();
     }
 
     /// <summary>
@@ -43,10 +48,7 @@ public class BallSpawn : MonoBehaviour
 
     private void SpawnBall(int index)
     {
-        Vector3 position = transform.position + new Vector3(
-            Random.Range(Mathf.Min(xRange.x, xRange.y), Mathf.Max(xRange.x, xRange.y)),
-            spawnHeight,
-            Random.Range(Mathf.Min(zRange.x, zRange.y), Mathf.Max(zRange.x, zRange.y)));
+        Vector3 position = GetRandomSpawnPosition();
 
         GameObject ball = ballPrefab != null
             ? Instantiate(ballPrefab, position, Quaternion.identity, transform)
@@ -69,6 +71,61 @@ public class BallSpawn : MonoBehaviour
 
         CollectibleBall.BallColor randomColor = GetRandomColor();
         collectibleBall.Initialize(this, randomColor, GetDisplayColor(randomColor));
+    }
+
+    /// <summary>
+    /// Spawns special items at random positions inside the configured map area.
+    /// </summary>
+    public void SpawnSpecialItems()
+    {
+        for (int i = 0; i < specialItemCount; i++)
+        {
+            SpawnSpecialItem(i);
+        }
+    }
+
+    private void SpawnSpecialItem(int index)
+    {
+        Vector3 position = GetRandomSpawnPosition();
+        GameObject item = specialItemPrefab != null
+            ? Instantiate(specialItemPrefab, position, Quaternion.identity, transform)
+            : GameObject.CreatePrimitive(PrimitiveType.Capsule);
+
+        if (specialItemPrefab == null)
+        {
+            item.transform.SetParent(transform);
+            item.transform.position = position;
+            Renderer itemRenderer = item.GetComponent<Renderer>();
+            if (itemRenderer != null)
+            {
+                itemRenderer.material.color = Color.magenta;
+            }
+        }
+
+        item.name = $"SpecialItem_{index + 1}";
+        item.transform.localScale *= specialItemScale;
+
+        SpecialItem specialItem = item.GetComponent<SpecialItem>();
+        if (specialItem == null)
+        {
+            specialItem = item.AddComponent<SpecialItem>();
+        }
+
+        specialItem.Initialize(GetRandomSpecialEffect());
+    }
+
+    private Vector3 GetRandomSpawnPosition()
+    {
+        return transform.position + new Vector3(
+            Random.Range(Mathf.Min(xRange.x, xRange.y), Mathf.Max(xRange.x, xRange.y)),
+            spawnHeight,
+            Random.Range(Mathf.Min(zRange.x, zRange.y), Mathf.Max(zRange.x, zRange.y)));
+    }
+
+    private static SpecialItem.EffectType GetRandomSpecialEffect()
+    {
+        int effectCount = System.Enum.GetValues(typeof(SpecialItem.EffectType)).Length;
+        return (SpecialItem.EffectType)Random.Range(0, effectCount);
     }
 
     public bool ContainsPosition(Vector3 worldPosition)

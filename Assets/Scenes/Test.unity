@@ -709,6 +709,11 @@ MonoBehaviour:
   heightPerDistance: 0.8
   distancePadding: 2
   zoomSmoothTime: 0.3
+  baseShakeStrength: 0.08
+  strengthPerExtraBall: 0.05
+  baseShakeDuration: 0.12
+  durationPerExtraBall: 0.025
+  maximumShakeStrength: 0.4
 --- !u!1 &859060298
 GameObject:
   m_ObjectHideFlags: 0
@@ -2880,6 +2885,9 @@ MonoBehaviour:
     type: 3}
   ballCount: 40
   ballScale: 0.3
+  specialItemPrefab: {fileID: 0}
+  specialItemCount: 0
+  specialItemScale: 1
   xRange: {x: -15, y: 15}
   zRange: {x: -15, y: 15}
   spawnHeight: 0.5
