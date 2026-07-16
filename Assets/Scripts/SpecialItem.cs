@@ -28,16 +28,20 @@ public class SpecialItem : MonoBehaviour
     [SerializeField, Min(0f)] private float slowDuration = 5f;
 
     private bool isCollected;
+    private BallSpawn ownerPool;
+    private GameObject itemRoot;
 
     public EffectType Effect => effectType;
     public static event Action<PlayerModel, EffectType> Collected;
 
-    public void Initialize(EffectType newEffectType)
+    public void Initialize(BallSpawn pool, GameObject root, EffectType newEffectType)
     {
+        ownerPool = pool;
+        itemRoot = root != null ? root : gameObject;
         effectType = newEffectType;
         isCollected = false;
 
-        Collider[] itemColliders = GetComponentsInChildren<Collider>(true);
+        Collider[] itemColliders = itemRoot.GetComponentsInChildren<Collider>(true);
         foreach (Collider itemCollider in itemColliders)
         {
             itemCollider.enabled = true;
@@ -72,7 +76,24 @@ public class SpecialItem : MonoBehaviour
         isCollected = true;
         ApplyEffect(player);
         Collected?.Invoke(player, effectType);
-        Destroy(gameObject);
+        if (ownerPool != null)
+        {
+            ownerPool.ReturnSpecialItemToPool(this, itemRoot);
+        }
+        else
+        {
+            Destroy(itemRoot != null ? itemRoot : gameObject);
+        }
+    }
+
+    public void PrepareForPool()
+    {
+        isCollected = true;
+        GameObject root = itemRoot != null ? itemRoot : gameObject;
+        foreach (Collider itemCollider in root.GetComponentsInChildren<Collider>(true))
+        {
+            itemCollider.enabled = false;
+        }
     }
 
     private void ApplyEffect(PlayerModel player)

@@ -8,6 +8,10 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private AudioSource musicSource;
     [SerializeField] private AudioSource soundEffectSource;
 
+    [Header("Background Music")]
+    [SerializeField] private AudioClip menuMusic;
+    [SerializeField] private AudioClip gameplayMusic;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -24,6 +28,21 @@ public class AudioManager : MonoBehaviour
 
         musicSource.loop = true;
         soundEffectSource.loop = false;
+    }
+
+    private void Start()
+    {
+        PlayMenuMusic();
+    }
+
+    public void PlayMenuMusic()
+    {
+        PlayMusic(menuMusic);
+    }
+
+    public void PlayGameplayMusic()
+    {
+        PlayMusic(gameplayMusic);
     }
 
     /// <summary>

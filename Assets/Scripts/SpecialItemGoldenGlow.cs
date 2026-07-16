@@ -10,6 +10,7 @@ public class SpecialItemGoldenGlow : MonoBehaviour
     [SerializeField, Min(0f)] private float pulseSpeed = 2.5f;
 
     private Light glowLight;
+    private ParticleSystem glowParticles;
     private Material glowMaterial;
     private float pulseOffset;
 
@@ -34,6 +35,7 @@ public class SpecialItemGoldenGlow : MonoBehaviour
         GameObject particleObject = new GameObject("Golden Glow Particles");
         particleObject.transform.SetParent(transform, false);
         ParticleSystem particles = particleObject.AddComponent<ParticleSystem>();
+        glowParticles = particles;
 
         ParticleSystem.MainModule main = particles.main;
         main.loop = true;
@@ -94,6 +96,33 @@ public class SpecialItemGoldenGlow : MonoBehaviour
         glowLight.range = radius * 2.5f;
         glowLight.intensity = lightIntensity;
         glowLight.shadows = LightShadows.None;
+    }
+
+    private void OnEnable()
+    {
+        if (glowParticles != null)
+        {
+            glowParticles.Clear(true);
+            glowParticles.Play(true);
+        }
+
+        if (glowLight != null)
+        {
+            glowLight.enabled = true;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (glowParticles != null)
+        {
+            glowParticles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        }
+
+        if (glowLight != null)
+        {
+            glowLight.enabled = false;
+        }
     }
 
     private void OnDestroy()

@@ -42,8 +42,10 @@ public class GameView : MonoBehaviour
 
     [Header("Game HUD")]
     [SerializeField] private Text countdownText;
-    [SerializeField] private Text playerOneCooldownText;
-    [SerializeField] private Text playerTwoCooldownText;
+    [SerializeField] private Image playerOneCooldownIcon;
+    [SerializeField] private Image playerTwoCooldownIcon;
+    [SerializeField] private Color dashCooldownColor = new Color(0.25f, 0.25f, 0.25f, 1f);
+    [SerializeField] private Color dashReadyColor = Color.white;
 
     [Header("Result Page")]
     [SerializeField] private Text playerOneScoreText;
@@ -64,6 +66,8 @@ public class GameView : MonoBehaviour
     private Color countdownDefaultColor;
     private int countdownDefaultFontSize;
     private Vector2 countdownDefaultPosition;
+    private Image playerOneCooldownFill;
+    private Image playerTwoCooldownFill;
     private static PlayerSpawner.PlayerJoinType[] savedRestartJoinOrder;
 
     public bool IsPlaying => isPlaying;
@@ -172,6 +176,7 @@ public class GameView : MonoBehaviour
         if (savedRestartJoinOrder == null || savedRestartJoinOrder.Length < 2
             || playerSpawner == null)
         {
+            PlayMenuMusic();
             return;
         }
 
@@ -200,6 +205,8 @@ public class GameView : MonoBehaviour
 
     public void OpenBattleMode()
     {
+        PlayMenuMusic();
+
         if (cameraController != null)
         {
             cameraController.MoveToMenuPosition(cameraPosition2);
@@ -221,31 +228,27 @@ public class GameView : MonoBehaviour
             return;
         }
 
+        playerSpawner.enabled = false;
+        players.Clear();
+        if (!playerSpawner.SpawnBattlePlayers(playerOneBattlePosition, playerTwoBattlePosition))
+        {
+            playerSpawner.enabled = true;
+            return;
+        }
+
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayGameplayMusic();
+        }
+
         if (cameraController != null)
         {
             cameraController.MoveToMenuPosition(cameraPosition3, true);
         }
 
-        playerSpawner.enabled = false;
         remainingTime = gameDuration;
         isPlaying = true;
         ResetCountdownStyle();
-        for (int i = 0; i < players.Count; i++)
-        {
-            PlayerController player = players[i];
-            if (player != null)
-            {
-                Transform battlePosition = i == 0
-                    ? playerOneBattlePosition
-                    : i == 1 ? playerTwoBattlePosition : null;
-                if (battlePosition != null)
-                {
-                    player.TeleportTo(battlePosition);
-                }
-
-                player.enabled = true;
-            }
-        }
 
         if (ballSpawn != null)
         {
@@ -284,6 +287,7 @@ public class GameView : MonoBehaviour
     {
         savedRestartJoinOrder = null;
         isPlaying = false;
+        PlayMenuMusic();
 
         if (cameraController != null && cameraPosition1 != null)
         {
@@ -300,6 +304,14 @@ public class GameView : MonoBehaviour
         }
 
         ReloadCurrentScene();
+    }
+
+    private static void PlayMenuMusic()
+    {
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayMenuMusic();
+        }
     }
 
     private static void ReloadCurrentScene()
@@ -399,11 +411,11 @@ public class GameView : MonoBehaviour
             RefreshCountdownWarning();
         }
 
-        SetCooldownText(playerOneCooldownText, 0, "P1");
-        SetCooldownText(playerTwoCooldownText, 1, "P2");
+        SetCooldownIcon(playerOneCooldownIcon, ref playerOneCooldownFill, 0);
+        SetCooldownIcon(playerTwoCooldownIcon, ref playerTwoCooldownFill, 1);
     }
 
-    private void SetCooldownText(Text target, int index, string label)
+    private void SetCooldownIcon(Image target, ref Image cooldownFill, int index)
     {
         if (target == null)
         {
@@ -412,17 +424,48 @@ public class GameView : MonoBehaviour
 
         if (index >= players.Count || players[index] == null)
         {
-            target.text = $"{label} Dash: --";
+            target.enabled = false;
+            if (cooldownFill != null)
+            {
+                cooldownFill.enabled = false;
+            }
             return;
         }
 
+        EnsureCooldownFill(target, ref cooldownFill);
+
         PlayerController player = players[index];
-        string state = player.IsDashing
-            ? "DASHING"
-            : player.DashCooldownRemaining > 0f
-                ? $"{player.DashCooldownRemaining:0.0}s"
-                : "READY";
-        target.text = $"{label} Dash: {state}";
+        target.enabled = true;
+        target.color = dashCooldownColor;
+
+        cooldownFill.enabled = true;
+        cooldownFill.sprite = target.sprite;
+        cooldownFill.color = dashReadyColor;
+        cooldownFill.fillAmount = player.IsDashing ? 0f : player.DashCooldownProgress;
+    }
+
+    private static void EnsureCooldownFill(Image target, ref Image cooldownFill)
+    {
+        if (cooldownFill != null)
+        {
+            return;
+        }
+
+        GameObject fillObject = new GameObject("Cooldown Radial Fill", typeof(RectTransform));
+        RectTransform fillTransform = fillObject.GetComponent<RectTransform>();
+        fillTransform.SetParent(target.rectTransform, false);
+        fillTransform.anchorMin = Vector2.zero;
+        fillTransform.anchorMax = Vector2.one;
+        fillTransform.offsetMin = Vector2.zero;
+        fillTransform.offsetMax = Vector2.zero;
+
+        cooldownFill = fillObject.AddComponent<Image>();
+        cooldownFill.raycastTarget = false;
+        cooldownFill.preserveAspect = target.preserveAspect;
+        cooldownFill.type = Image.Type.Filled;
+        cooldownFill.fillMethod = Image.FillMethod.Radial360;
+        cooldownFill.fillOrigin = (int)Image.Origin360.Top;
+        cooldownFill.fillClockwise = true;
     }
 
     private void CacheCountdownStyle()

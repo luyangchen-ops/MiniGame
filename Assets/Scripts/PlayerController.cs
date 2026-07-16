@@ -41,6 +41,7 @@ public class PlayerController : MonoBehaviour
     [Header("Special Effect Visuals")]
     [SerializeField] private Color aimGuideColor = new Color(1f, 1f, 1f, 0.8f);
     [SerializeField, Min(0.001f)] private float aimGuideWidth = 0.04f;
+    [SerializeField, Min(0f)] private float aimGuideHeightOffset = 0.15f;
 
     private Rigidbody body;
     private PlayerModel playerModel;
@@ -70,6 +71,9 @@ public class PlayerController : MonoBehaviour
         new System.Collections.Generic.List<Vector3>();
 
     public float DashCooldownRemaining => Mathf.Max(0f, nextDashTime - Time.time);
+    public float DashCooldownProgress => dashCooldown <= 0f
+        ? 1f
+        : 1f - Mathf.Clamp01(DashCooldownRemaining / dashCooldown);
     public bool IsDashing => dashRemainingDistance > 0f;
 
     /// <summary>把玩家安全地移动到新区域，并重置移动与球链轨迹状态。</summary>
@@ -350,7 +354,7 @@ public class PlayerController : MonoBehaviour
             aimGuide.enabled = showAimGuide;
             if (showAimGuide)
             {
-                Vector3 start = body.position;
+                Vector3 start = body.position + Vector3.up * aimGuideHeightOffset;
                 Vector3 forward = body.rotation * Vector3.forward;
                 aimGuide.SetPosition(0, start);
                 aimGuide.SetPosition(1, start + forward * aimGuideLength);

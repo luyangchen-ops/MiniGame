@@ -15,19 +15,23 @@ public class PlayerSpawner : MonoBehaviour
         Gamepad
     }
 
-    [Header("Player Prefabs")]
-    [SerializeField] private GameObject wasdPlayerPrefab;
-    [SerializeField] private GameObject gamepadPlayerPrefab;
+    [Header("Battle Player Prefabs")]
+    [SerializeField] private GameObject playerOneKeyboardPrefab;
+    [SerializeField] private GameObject playerTwoKeyboardPrefab;
+    [SerializeField] private GameObject playerOneGamepadPrefab;
+    [SerializeField] private GameObject playerTwoGamepadPrefab;
 
-    [Header("Spawn Points")]
-    [SerializeField] private Transform firstSpawnPoint;
-    [SerializeField] private Transform secondSpawnPoint;
+    [Header("Join Preview Models")]
+    [Tooltip("Join 页面中预先放置的 P1 模型，不需要挂控制脚本")]
+    [SerializeField] private GameObject playerOneJoinModel;
+    [Tooltip("Join 页面中预先放置的 P2 模型，不需要挂控制脚本")]
+    [SerializeField] private GameObject playerTwoJoinModel;
 
     private bool keyboardHasJoined;
     private bool arrowKeyboardHasJoined;
     private bool gamepadHasJoined;
-    private int nextSpawnIndex;
     private readonly List<PlayerJoinType> joinOrder = new List<PlayerJoinType>(2);
+    private bool battlePlayersSpawned;
 
     public bool KeyboardHasJoined => keyboardHasJoined;
     public bool ArrowKeyboardHasJoined => arrowKeyboardHasJoined;
@@ -48,64 +52,119 @@ public class PlayerSpawner : MonoBehaviour
 
         if (!keyboardHasJoined && WasKeyboardJoinPressed())
         {
-            keyboardHasJoined = TrySpawn(
-                wasdPlayerPrefab,
-                "WASD",
-                PlayerController.KeyboardControlScheme.WasdSpaceShift,
-                PlayerJoinType.Wasd);
+            keyboardHasJoined = TryJoin(PlayerJoinType.Wasd);
         }
 
         if (!BothPlayersJoined && !arrowKeyboardHasJoined && WasArrowKeyboardJoinPressed())
         {
-            arrowKeyboardHasJoined = TrySpawn(
-                wasdPlayerPrefab,
-                "Arrow Keyboard",
-                PlayerController.KeyboardControlScheme.ArrowsEnterCtrl,
-                PlayerJoinType.Arrows);
+            arrowKeyboardHasJoined = TryJoin(PlayerJoinType.Arrows);
         }
 
         if (!BothPlayersJoined && !gamepadHasJoined && WasGamepadJoinPressed())
         {
-            gamepadHasJoined = TrySpawn(
-                gamepadPlayerPrefab,
-                "Gamepad",
-                null,
-                PlayerJoinType.Gamepad);
+            gamepadHasJoined = TryJoin(PlayerJoinType.Gamepad);
         }
     }
 
-    private bool TrySpawn(
-        GameObject playerPrefab,
-        string deviceName,
-        PlayerController.KeyboardControlScheme? keyboardScheme,
-        PlayerJoinType joinType)
+    private bool TryJoin(PlayerJoinType joinType)
     {
-        Transform spawnPoint = nextSpawnIndex == 0 ? firstSpawnPoint : secondSpawnPoint;
-
-        if (playerPrefab == null || spawnPoint == null)
+        if (joinOrder.Count >= 2)
         {
-            Debug.LogError(
-                $"PlayerSpawner: {deviceName} player prefab or spawn point is not assigned.",
-                this);
             return false;
         }
 
-        GameObject playerObject = Instantiate(playerPrefab, spawnPoint.position, spawnPoint.rotation);
-        PlayerController controller = playerObject.GetComponent<PlayerController>();
-        if (controller != null)
+        GameObject joinModel = joinOrder.Count == 0 ? playerOneJoinModel : playerTwoJoinModel;
+        if (joinModel != null)
         {
-            if (keyboardScheme.HasValue)
-            {
-                controller.SetKeyboardControlScheme(keyboardScheme.Value);
-            }
-
-            controller.enabled = false;
+            joinModel.SetActive(true);
         }
 
-        nextSpawnIndex++;
         joinOrder.Add(joinType);
-        PlayerSpawned?.Invoke(controller);
         return true;
+    }
+
+    public bool SpawnBattlePlayers(Transform playerOnePosition, Transform playerTwoPosition)
+    {
+        if (battlePlayersSpawned)
+        {
+            return true;
+        }
+
+        if (!BothPlayersJoined || playerOnePosition == null || playerTwoPosition == null)
+        {
+            Debug.LogError("PlayerSpawner: two joined players and both battle positions are required.", this);
+            return false;
+        }
+
+        for (int i = 0; i < 2; i++)
+        {
+            GameObject battlePrefab = GetBattlePrefab(i, joinOrder[i]);
+            if (battlePrefab == null)
+            {
+                Debug.LogError($"PlayerSpawner: battle prefab for P{i + 1} ({joinOrder[i]}) is not assigned.", this);
+                return false;
+            }
+
+            if (battlePrefab.GetComponentInChildren<PlayerController>(true) == null)
+            {
+                Debug.LogError($"PlayerSpawner: P{i + 1} battle prefab has no PlayerController.", this);
+                return false;
+            }
+        }
+
+        SetJoinModelsVisible(false);
+        for (int i = 0; i < 2; i++)
+        {
+            Transform battlePosition = i == 0 ? playerOnePosition : playerTwoPosition;
+            PlayerJoinType joinType = joinOrder[i];
+            GameObject playerObject = Instantiate(
+                GetBattlePrefab(i, joinType),
+                battlePosition.position,
+                battlePosition.rotation);
+            PlayerController controller = playerObject.GetComponent<PlayerController>();
+            if (controller == null)
+            {
+                controller = playerObject.GetComponentInChildren<PlayerController>();
+            }
+
+            if (controller != null)
+            {
+                if (joinType == PlayerJoinType.Wasd)
+                {
+                    controller.SetKeyboardControlScheme(
+                        PlayerController.KeyboardControlScheme.WasdSpaceShift);
+                }
+                else if (joinType == PlayerJoinType.Arrows)
+                {
+                    controller.SetKeyboardControlScheme(
+                        PlayerController.KeyboardControlScheme.ArrowsEnterCtrl);
+                }
+
+                controller.enabled = true;
+            }
+
+            PlayerSpawned?.Invoke(controller);
+        }
+
+        battlePlayersSpawned = true;
+        return true;
+    }
+
+    private GameObject GetBattlePrefab(int playerIndex, PlayerJoinType joinType)
+    {
+        bool usesGamepad = joinType == PlayerJoinType.Gamepad;
+        if (playerIndex == 0)
+        {
+            return usesGamepad ? playerOneGamepadPrefab : playerOneKeyboardPrefab;
+        }
+
+        return usesGamepad ? playerTwoGamepadPrefab : playerTwoKeyboardPrefab;
+    }
+
+    private void SetJoinModelsVisible(bool visible)
+    {
+        if (playerOneJoinModel != null) playerOneJoinModel.SetActive(visible);
+        if (playerTwoJoinModel != null) playerTwoJoinModel.SetActive(visible);
     }
 
     public void SpawnSavedPlayers(IReadOnlyList<PlayerJoinType> savedJoinOrder)
@@ -125,21 +184,13 @@ public class PlayerSpawner : MonoBehaviour
             switch (joinType)
             {
                 case PlayerJoinType.Wasd:
-                    keyboardHasJoined = TrySpawn(
-                        wasdPlayerPrefab,
-                        "WASD",
-                        PlayerController.KeyboardControlScheme.WasdSpaceShift,
-                        joinType);
+                    keyboardHasJoined = TryJoin(joinType);
                     break;
                 case PlayerJoinType.Arrows:
-                    arrowKeyboardHasJoined = TrySpawn(
-                        wasdPlayerPrefab,
-                        "Arrow Keyboard",
-                        PlayerController.KeyboardControlScheme.ArrowsEnterCtrl,
-                        joinType);
+                    arrowKeyboardHasJoined = TryJoin(joinType);
                     break;
                 case PlayerJoinType.Gamepad:
-                    gamepadHasJoined = TrySpawn(gamepadPlayerPrefab, "Gamepad", null, joinType);
+                    gamepadHasJoined = TryJoin(joinType);
                     break;
             }
         }

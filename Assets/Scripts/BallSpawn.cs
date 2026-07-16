@@ -20,6 +20,9 @@ public class BallSpawn : MonoBehaviour
     [SerializeField, Min(0)] private int specialItemCount = 3;
     [SerializeField, Min(0.01f)] private float specialItemScale = 1f;
     [SerializeField, Min(0.1f)] private float specialItemSpawnInterval = 20f;
+    [SerializeField, Min(0f)] private float normalEffectWeight = 1f;
+    [SerializeField, Min(0f)] private float explosiveBallWeight = 2f;
+    [SerializeField, Min(0f)] private float infectionWeight = 2f;
 
     [Header("Circular Spawn Area (relative to this object)")]
     [SerializeField, Min(0.01f)] private float spawnRadius = 10f;
@@ -27,6 +30,7 @@ public class BallSpawn : MonoBehaviour
     [SerializeField] private float spawnHeight = 0.5f;
 
     private readonly Queue<CollectibleBall> ballPool = new Queue<CollectibleBall>();
+    private readonly Queue<GameObject> specialItemPool = new Queue<GameObject>();
     private int spawnedBallCount;
     private int spawnedSpecialItemCount;
     private bool spawningStarted;
@@ -132,14 +136,20 @@ public class BallSpawn : MonoBehaviour
     private void SpawnSpecialItem(int index)
     {
         Vector3 position = GetRandomSpawnPosition();
-        GameObject item = specialItemPrefab != null
-            ? Instantiate(specialItemPrefab, position, Quaternion.identity, transform)
-            : GameObject.CreatePrimitive(PrimitiveType.Capsule);
+        bool reusedFromPool = specialItemPool.Count > 0;
+        GameObject item = reusedFromPool
+            ? specialItemPool.Dequeue()
+            : specialItemPrefab != null
+                ? Instantiate(specialItemPrefab, position, Quaternion.identity, transform)
+                : GameObject.CreatePrimitive(PrimitiveType.Capsule);
 
-        if (specialItemPrefab == null)
+        item.transform.SetParent(transform);
+        item.transform.position = position;
+        item.transform.rotation = Quaternion.identity;
+        item.SetActive(true);
+
+        if (!reusedFromPool && specialItemPrefab == null)
         {
-            item.transform.SetParent(transform);
-            item.transform.position = position;
             Renderer itemRenderer = item.GetComponent<Renderer>();
             if (itemRenderer != null)
             {
@@ -148,20 +158,36 @@ public class BallSpawn : MonoBehaviour
         }
 
         item.name = $"SpecialItem_{index + 1}";
-        item.transform.localScale *= specialItemScale;
+        if (!reusedFromPool)
+        {
+            item.transform.localScale *= specialItemScale;
+        }
 
-        SpecialItem specialItem = item.GetComponent<SpecialItem>();
+        SpecialItem specialItem = item.GetComponentInChildren<SpecialItem>(true);
         if (specialItem == null)
         {
             specialItem = item.AddComponent<SpecialItem>();
         }
 
-        specialItem.Initialize(GetRandomSpecialEffect());
+        specialItem.Initialize(this, item, GetRandomSpecialEffect());
 
         if (item.GetComponent<SpecialItemGoldenGlow>() == null)
         {
             item.AddComponent<SpecialItemGoldenGlow>();
         }
+    }
+
+    public void ReturnSpecialItemToPool(SpecialItem specialItem, GameObject itemRoot)
+    {
+        if (specialItem == null || itemRoot == null || !itemRoot.activeSelf)
+        {
+            return;
+        }
+
+        specialItem.PrepareForPool();
+        itemRoot.transform.SetParent(transform, true);
+        itemRoot.SetActive(false);
+        specialItemPool.Enqueue(itemRoot);
     }
 
     private Vector3 GetRandomSpawnPosition()
@@ -171,10 +197,45 @@ public class BallSpawn : MonoBehaviour
         return transform.position + new Vector3(point.x, spawnHeight, point.y);
     }
 
-    private static SpecialItem.EffectType GetRandomSpecialEffect()
+    private SpecialItem.EffectType GetRandomSpecialEffect()
     {
-        int effectCount = System.Enum.GetValues(typeof(SpecialItem.EffectType)).Length;
-        return (SpecialItem.EffectType)Random.Range(0, effectCount);
+        SpecialItem.EffectType[] effects =
+            (SpecialItem.EffectType[])System.Enum.GetValues(typeof(SpecialItem.EffectType));
+        float totalWeight = 0f;
+        foreach (SpecialItem.EffectType effect in effects)
+        {
+            totalWeight += GetSpecialEffectWeight(effect);
+        }
+
+        if (totalWeight <= 0f)
+        {
+            return effects[Random.Range(0, effects.Length)];
+        }
+
+        float selection = Random.value * totalWeight;
+        foreach (SpecialItem.EffectType effect in effects)
+        {
+            selection -= GetSpecialEffectWeight(effect);
+            if (selection <= 0f)
+            {
+                return effect;
+            }
+        }
+
+        return effects[effects.Length - 1];
+    }
+
+    private float GetSpecialEffectWeight(SpecialItem.EffectType effect)
+    {
+        switch (effect)
+        {
+            case SpecialItem.EffectType.ExplosiveBall:
+                return explosiveBallWeight;
+            case SpecialItem.EffectType.Infection:
+                return infectionWeight;
+            default:
+                return normalEffectWeight;
+        }
     }
 
     public bool ContainsPosition(Vector3 worldPosition)
