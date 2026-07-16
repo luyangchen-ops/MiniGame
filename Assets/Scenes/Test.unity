@@ -745,6 +745,8 @@ MonoBehaviour:
   startGameButton: {fileID: 1435390783}
   keyboardStatusText: {fileID: 59407470}
   gamepadStatusText: {fileID: 2024691146}
+  playerOneBattlePosition: {fileID: 0}
+  playerTwoBattlePosition: {fileID: 0}
   countdownText: {fileID: 1534714555}
   playerOneCooldownText: {fileID: 262995753}
   playerTwoCooldownText: {fileID: 937563669}
@@ -2121,6 +2123,8 @@ MonoBehaviour:
   startGameButton: {fileID: 0}
   keyboardStatusText: {fileID: 0}
   gamepadStatusText: {fileID: 0}
+  playerOneBattlePosition: {fileID: 0}
+  playerTwoBattlePosition: {fileID: 0}
   countdownText: {fileID: 0}
   playerOneCooldownText: {fileID: 0}
   playerTwoCooldownText: {fileID: 0}
@@ -2640,7 +2644,7 @@ GameObject:
   - component: {fileID: 1466096375}
   - component: {fileID: 1466096374}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: GESpawner
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3743,7 +3747,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 2470cd4129c641b468e4262fd695afd3, type: 2}
+  - {fileID: 2100000, guid: 9705187c54f042c45aed0894b342de97, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

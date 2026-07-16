@@ -69,6 +69,44 @@ public class PlayerController : MonoBehaviour
     public float DashCooldownRemaining => Mathf.Max(0f, nextDashTime - Time.time);
     public bool IsDashing => dashRemainingDistance > 0f;
 
+    /// <summary>把玩家安全地移动到新区域，并重置移动与球链轨迹状态。</summary>
+    public void TeleportTo(Transform destination)
+    {
+        if (destination == null)
+        {
+            return;
+        }
+
+        if (body == null)
+        {
+            body = GetComponent<Rigidbody>();
+        }
+
+        body.velocity = Vector3.zero;
+        body.angularVelocity = Vector3.zero;
+        body.position = destination.position;
+        body.rotation = destination.rotation;
+        transform.SetPositionAndRotation(destination.position, destination.rotation);
+
+        desiredDirection = destination.forward;
+        desiredDirection.y = 0f;
+        if (desiredDirection.sqrMagnitude < 0.001f)
+        {
+            desiredDirection = Vector3.forward;
+        }
+        else
+        {
+            desiredDirection.Normalize();
+        }
+
+        movementAmount = 0f;
+        launchRequested = false;
+        dashRequested = false;
+        dashRemainingDistance = 0f;
+        trail.Clear();
+        trail.Add(destination.position);
+    }
+
     public void SetKeyboardControlScheme(KeyboardControlScheme scheme)
     {
         keyboardControlScheme = scheme;

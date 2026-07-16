@@ -65,7 +65,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9705187c54f042c45aed0894b342de97, type: 2}
+  - {fileID: 2100000, guid: a27397af85d9dbd4eaa85d243a6622ec, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -160,6 +160,8 @@ MonoBehaviour:
   ballLaunchSpeed: 25
   launchClearance: 0.1
   attackInterval: 0.3
+  aimGuideColor: {r: 1, g: 1, b: 1, a: 0.8}
+  aimGuideWidth: 0.04
 --- !u!114 &8045469588288536989
 MonoBehaviour:
   m_ObjectHideFlags: 0

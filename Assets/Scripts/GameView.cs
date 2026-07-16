@@ -34,6 +34,12 @@ public class GameView : MonoBehaviour
     [SerializeField] private Text keyboardStatusText;
     [SerializeField] private Text gamepadStatusText;
 
+    [Header("Battle Player Positions")]
+    [Tooltip("玩家 1 进入对战区后的起始位置和朝向")]
+    [SerializeField] private Transform playerOneBattlePosition;
+    [Tooltip("玩家 2 进入对战区后的起始位置和朝向")]
+    [SerializeField] private Transform playerTwoBattlePosition;
+
     [Header("Game HUD")]
     [SerializeField] private Text countdownText;
     [SerializeField] private Text playerOneCooldownText;
@@ -224,10 +230,19 @@ public class GameView : MonoBehaviour
         remainingTime = gameDuration;
         isPlaying = true;
         ResetCountdownStyle();
-        foreach (PlayerController player in players)
+        for (int i = 0; i < players.Count; i++)
         {
+            PlayerController player = players[i];
             if (player != null)
             {
+                Transform battlePosition = i == 0
+                    ? playerOneBattlePosition
+                    : i == 1 ? playerTwoBattlePosition : null;
+                if (battlePosition != null)
+                {
+                    player.TeleportTo(battlePosition);
+                }
+
                 player.enabled = true;
             }
         }
