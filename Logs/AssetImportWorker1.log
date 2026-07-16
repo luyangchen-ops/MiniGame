@@ -3385,3 +3385,28 @@ AssetImportParameters requested are different than current active one (requested
   custom:audio-encoder-webm-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
   custom:scripting/precompiled-assembly-types:Assembly-CSharp: 9cf656f23d4bc835ef34c7ec6793d058 -> ba845ee12173b5aace21b33b84f222e5
   custom:scripting/monoscript/fileName/ExplosiveBallGlow.cs: 18506515319cbd3ff5f4057d2f8431a1 -> 
+========================================================================
+Received Import Request.
+  Time since last request: 1914.772100 seconds.
+  path: Assets/Resources/Pic/鍖归厤/p2.png
+  artifactKey: Guid(048baa67dddeced4c80b7ab2bf81aa75) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Resources/Pic/鍖归厤/p2.png using Guid(048baa67dddeced4c80b7ab2bf81aa75) Importer(815301076,1909f56bfc062723c751e8b465ee728b) [PhysX] Initialized MultithreadedTaskDispatcher with 20 workers.
+[PhysX] Initialized MultithreadedTaskDispatcher with 20 workers.
+ -> (artifact id: '8a6e0b202cdf5d62becadcb34f46b22d') in 0.050986 seconds
+Number of updated asset objects reloaded before import = 0
+Number of asset objects unloaded after import = 3
+========================================================================
+Received Import Request.
+  Time since last request: 1.748331 seconds.
+  path: Assets/Resources/Pic/鍖归厤/鍙夊瓙.png
+  artifactKey: Guid(74d006d588a32c548aa3ff2a96278c75) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Resources/Pic/鍖归厤/鍙夊瓙.png using Guid(74d006d588a32c548aa3ff2a96278c75) Importer(815301076,1909f56bfc062723c751e8b465ee728b) [PhysX] Initialized MultithreadedTaskDispatcher with 20 workers.
+[PhysX] Initialized MultithreadedTaskDispatcher with 20 workers.
+ -> (artifact id: '46f0b9fe5d150881ddd616609eae0b7d') in 0.014541 seconds
+Number of updated asset objects reloaded before import = 0
+Number of asset objects unloaded after import = 3
+Editor requested this worker to shutdown with reason: Scaling down because of idle timeout
+TcpMessagingSession - receive error: operation aborted. errorcode: 995, details: 由于线程退出或应用程序请求，已中止 I/O 操作。
+AssetImportWorker is now disconnected from the server
+Process exiting
+Exiting without the bug reporter. Application will terminate with return code 0

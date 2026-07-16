@@ -13,6 +13,7 @@ public class BallSpawn : MonoBehaviour
     [SerializeField, Min(0)] private int ballCount = 20;
     [SerializeField, Min(0.01f)] private float ballScale = 1f;
     [SerializeField, Min(0.1f)] private float ballSpawnInterval = 60f;
+    [SerializeField, Min(0)] private int ballsPerSpawn = 1;
 
     [Header("Special Items")]
     [SerializeField] private GameObject specialItemPrefab;
@@ -110,8 +111,11 @@ public class BallSpawn : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(ballSpawnInterval);
-            SpawnBall(spawnedBallCount);
-            spawnedBallCount++;
+            for (int i = 0; i < ballsPerSpawn; i++)
+            {
+                SpawnBall(spawnedBallCount);
+                spawnedBallCount++;
+            }
         }
     }
 
