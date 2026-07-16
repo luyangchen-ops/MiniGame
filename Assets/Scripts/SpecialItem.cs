@@ -22,6 +22,8 @@ public class SpecialItem : MonoBehaviour
     [SerializeField, Min(0.1f)] private float aimGuideLength = 12f;
     [SerializeField, Min(0.1f)] private float suctionRadius = 4f;
     [SerializeField, Min(0f)] private float suctionDuration = 6f;
+    [Tooltip("爆炸球提示持续时间；设为 0 时一直持续到使用")]
+    [SerializeField, Min(0f)] private float explosiveBallDuration = 10f;
     [SerializeField, Range(0.01f, 1f)] private float slowMultiplier = 0.5f;
     [SerializeField, Min(0f)] private float slowDuration = 5f;
 
@@ -100,7 +102,7 @@ public class SpecialItem : MonoBehaviour
             case EffectType.ExplosiveBall:
                 if (controller != null)
                 {
-                    controller.ArmExplosiveBall();
+                    controller.ArmExplosiveBall(explosiveBallDuration);
                 }
                 break;
             case EffectType.Infection:

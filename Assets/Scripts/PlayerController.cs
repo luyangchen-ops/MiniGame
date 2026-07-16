@@ -62,6 +62,9 @@ public class PlayerController : MonoBehaviour
     private float aimGuideEndTime;
     private float aimGuideLength;
     private bool explosiveBallArmed;
+    private float explosiveBallEndTime;
+    private CollectibleBall explosiveGlowBall;
+    private ExplosiveBallGlow explosiveGlow;
     private LineRenderer aimGuide;
     private readonly System.Collections.Generic.List<Vector3> trail =
         new System.Collections.Generic.List<Vector3>();
@@ -236,6 +239,8 @@ public class PlayerController : MonoBehaviour
         {
             ball.SetExplosive(true);
             explosiveBallArmed = false;
+            explosiveBallEndTime = 0f;
+            ClearExplosiveBallGlow();
         }
 
         Vector3 launchDirection = body.rotation * Vector3.forward;
@@ -298,9 +303,11 @@ public class PlayerController : MonoBehaviour
         EnsureAimGuide();
     }
 
-    public void ArmExplosiveBall()
+    public void ArmExplosiveBall(float duration = 0f)
     {
         explosiveBallArmed = true;
+        explosiveBallEndTime = duration > 0f ? Time.time + duration : 0f;
+        RefreshExplosiveBallGlow();
     }
 
     private float GetSpeedMultiplier()
@@ -312,6 +319,18 @@ public class PlayerController : MonoBehaviour
 
     private void UpdateTimedEffects()
     {
+        if (explosiveBallArmed && explosiveBallEndTime > 0f
+            && Time.time >= explosiveBallEndTime)
+        {
+            explosiveBallArmed = false;
+            explosiveBallEndTime = 0f;
+            ClearExplosiveBallGlow();
+        }
+        else
+        {
+            RefreshExplosiveBallGlow();
+        }
+
         if (Time.time < suctionEndTime)
         {
             Collider[] nearby = Physics.OverlapSphere(transform.position, suctionRadius);
@@ -337,6 +356,39 @@ public class PlayerController : MonoBehaviour
                 aimGuide.SetPosition(1, start + forward * aimGuideLength);
             }
         }
+    }
+
+    private void RefreshExplosiveBallGlow()
+    {
+        CollectibleBall firstBall = explosiveBallArmed && playerModel != null
+                                    && playerModel.CollectedBalls.Count > 0
+            ? playerModel.CollectedBalls[0].Ball
+            : null;
+
+        if (firstBall == explosiveGlowBall)
+        {
+            return;
+        }
+
+        ClearExplosiveBallGlow();
+        if (firstBall == null)
+        {
+            return;
+        }
+
+        explosiveGlowBall = firstBall;
+        explosiveGlow = firstBall.gameObject.AddComponent<ExplosiveBallGlow>();
+    }
+
+    private void ClearExplosiveBallGlow()
+    {
+        if (explosiveGlow != null)
+        {
+            Destroy(explosiveGlow);
+        }
+
+        explosiveGlow = null;
+        explosiveGlowBall = null;
     }
 
     private void EnsureAimGuide()
