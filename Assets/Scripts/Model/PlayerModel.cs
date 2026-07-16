@@ -122,8 +122,9 @@ public class PlayerModel : MonoBehaviour
             removedBalls.Add(collectedBalls[i].Ball);
         }
 
+        Vector3 eliminationCenter = GetBallGroupCenter(removedBalls);
         collectedBalls.RemoveRange(first, matchCount);
-        TriggerEliminationFeedback(matchCount);
+        TriggerEliminationFeedback(matchCount, eliminationCenter);
         foreach (CollectibleBall ball in removedBalls)
         {
             if (ball != null)
@@ -164,8 +165,9 @@ public class PlayerModel : MonoBehaviour
             removedBalls.Add(collectedBalls[i].Ball);
         }
 
+        Vector3 eliminationCenter = GetBallGroupCenter(removedBalls);
         collectedBalls.RemoveRange(first, removeCount);
-        TriggerEliminationFeedback(removeCount);
+        TriggerEliminationFeedback(removeCount, eliminationCenter);
         foreach (CollectibleBall ball in removedBalls)
         {
             if (ball != null)
@@ -175,12 +177,38 @@ public class PlayerModel : MonoBehaviour
         }
     }
 
-    private static void TriggerEliminationFeedback(int eliminatedBallCount)
+    private static Vector3 GetBallGroupCenter(IReadOnlyList<CollectibleBall> balls)
+    {
+        Vector3 center = Vector3.zero;
+        int validBallCount = 0;
+        for (int i = 0; i < balls.Count; i++)
+        {
+            if (balls[i] == null)
+            {
+                continue;
+            }
+
+            center += balls[i].transform.position;
+            validBallCount++;
+        }
+
+        return validBallCount > 0 ? center / validBallCount : Vector3.zero;
+    }
+
+    private static void TriggerEliminationFeedback(
+        int eliminatedBallCount,
+        Vector3 eliminationPosition)
     {
         CameraController cameraController = FindObjectOfType<CameraController>();
         if (cameraController != null)
         {
             cameraController.ShakeForElimination(eliminatedBallCount);
+        }
+
+        GESpawner effectSpawner = FindObjectOfType<GESpawner>();
+        if (effectSpawner != null)
+        {
+            effectSpawner.PlayElimination(eliminationPosition);
         }
     }
 }

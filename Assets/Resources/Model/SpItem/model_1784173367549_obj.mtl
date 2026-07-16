@@ -1,0 +1,17 @@
+# Converted from GLB by TACO at 2026-07-16T03:47:43.107Z
+# materials=1
+
+newmtl tripo_material_53baa0ed-2797-40ba-bcb3-83dd1e238112
+Ka 0 0 0
+Kd 1 1 1
+Ks 0.900 0.900 0.900
+Ke 0 0 0
+Ns 0
+d 1
+illum 2
+Pm 1
+Pr 1
+map_Kd textures/Color_53baa0ed-2797-40ba-bcb3-83dd1e238112.jpg
+map_Bump -bm 1 textures/NormalGL_53baa0ed-2797-40ba-bcb3-83dd1e238112.png
+map_Pm textures/ORM_53baa0ed-2797-40ba-bcb3-83dd1e238112.png
+map_Pr textures/ORM_53baa0ed-2797-40ba-bcb3-83dd1e238112.png

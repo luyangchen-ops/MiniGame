@@ -20,9 +20,9 @@ public class BallSpawn : MonoBehaviour
     [SerializeField, Min(0.01f)] private float specialItemScale = 1f;
     [SerializeField, Min(0.1f)] private float specialItemSpawnInterval = 20f;
 
-    [Header("Spawn Area (relative to this object)")]
-    [SerializeField] private Vector2 xRange = new Vector2(-10f, 10f);
-    [SerializeField] private Vector2 zRange = new Vector2(-10f, 10f);
+    [Header("Circular Spawn Area (relative to this object)")]
+    [SerializeField, Min(0.01f)] private float spawnRadius = 10f;
+    [SerializeField] private Vector2 spawnCenterOffset;
     [SerializeField] private float spawnHeight = 0.5f;
 
     private readonly Queue<CollectibleBall> ballPool = new Queue<CollectibleBall>();
@@ -153,14 +153,18 @@ public class BallSpawn : MonoBehaviour
         }
 
         specialItem.Initialize(GetRandomSpecialEffect());
+
+        if (item.GetComponent<SpecialItemGoldenGlow>() == null)
+        {
+            item.AddComponent<SpecialItemGoldenGlow>();
+        }
     }
 
     private Vector3 GetRandomSpawnPosition()
     {
-        return transform.position + new Vector3(
-            Random.Range(Mathf.Min(xRange.x, xRange.y), Mathf.Max(xRange.x, xRange.y)),
-            spawnHeight,
-            Random.Range(Mathf.Min(zRange.x, zRange.y), Mathf.Max(zRange.x, zRange.y)));
+        // insideUnitCircle 按面积均匀采样，不会让生成物集中在圆心。
+        Vector2 point = Random.insideUnitCircle * spawnRadius + spawnCenterOffset;
+        return transform.position + new Vector3(point.x, spawnHeight, point.y);
     }
 
     private static SpecialItem.EffectType GetRandomSpecialEffect()
@@ -172,13 +176,9 @@ public class BallSpawn : MonoBehaviour
     public bool ContainsPosition(Vector3 worldPosition)
     {
         Vector3 relativePosition = worldPosition - transform.position;
-        float minX = Mathf.Min(xRange.x, xRange.y);
-        float maxX = Mathf.Max(xRange.x, xRange.y);
-        float minZ = Mathf.Min(zRange.x, zRange.y);
-        float maxZ = Mathf.Max(zRange.x, zRange.y);
-
-        return relativePosition.x >= minX && relativePosition.x <= maxX
-               && relativePosition.z >= minZ && relativePosition.z <= maxZ;
+        Vector2 horizontalPosition = new Vector2(relativePosition.x, relativePosition.z);
+        return (horizontalPosition - spawnCenterOffset).sqrMagnitude
+               <= spawnRadius * spawnRadius;
     }
 
     public void ReturnToPool(CollectibleBall ball)
@@ -250,18 +250,19 @@ public class BallSpawn : MonoBehaviour
 
     private void OnDrawGizmosSelected()
     {
-        float minX = Mathf.Min(xRange.x, xRange.y);
-        float maxX = Mathf.Max(xRange.x, xRange.y);
-        float minZ = Mathf.Min(zRange.x, zRange.y);
-        float maxZ = Mathf.Max(zRange.x, zRange.y);
-
-        Vector3 center = transform.position + new Vector3(
-            (minX + maxX) * 0.5f,
-            spawnHeight,
-            (minZ + maxZ) * 0.5f);
-        Vector3 size = new Vector3(maxX - minX, 0.05f, maxZ - minZ);
-
         Gizmos.color = Color.cyan;
-        Gizmos.DrawWireCube(center, size);
+        Vector3 center = transform.position
+                         + new Vector3(spawnCenterOffset.x, spawnHeight, spawnCenterOffset.y);
+        const int segmentCount = 64;
+        Vector3 previousPoint = center + Vector3.right * spawnRadius;
+        for (int i = 1; i <= segmentCount; i++)
+        {
+            float angle = i * Mathf.PI * 2f / segmentCount;
+            Vector3 nextPoint = center
+                                + new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle))
+                                * spawnRadius;
+            Gizmos.DrawLine(previousPoint, nextPoint);
+            previousPoint = nextPoint;
+        }
     }
 }

@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(Camera))]
@@ -14,6 +16,10 @@ public class CameraController : MonoBehaviour
     [Header("Follow")]
     [SerializeField, Min(0.01f)] private float followSmoothTime = 0.25f;
     [SerializeField] private Vector2 centerOffset;
+
+    [Header("Menu Transitions")]
+    [SerializeField, Min(0.01f)] private float transitionDuration = 1f;
+    [SerializeField] private AnimationCurve transitionCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
 
     [Header("Dynamic Zoom")]
     [SerializeField, Min(0.1f)] private float minimumHeight = 7f;
@@ -36,6 +42,8 @@ public class CameraController : MonoBehaviour
     private float shakeDuration;
     private float shakeStrength;
     private Vector3 previousShakeOffset;
+    private Coroutine transitionRoutine;
+    private bool menuTransitionActive;
 
     private void Awake()
     {
@@ -47,6 +55,12 @@ public class CameraController : MonoBehaviour
         // Remove last frame's additive shake before calculating camera follow.
         transform.position -= previousShakeOffset;
         previousShakeOffset = Vector3.zero;
+
+        if (menuTransitionActive)
+        {
+            ApplyShake();
+            return;
+        }
 
         FindMissingPlayers();
         if (playerOne == null || playerTwo == null)
@@ -104,6 +118,78 @@ public class CameraController : MonoBehaviour
         ApplyShake();
     }
 
+    /// <summary>立即把镜头放到菜单机位，并暂停玩家追踪。</summary>
+    public void SnapToMenuPosition(Transform target)
+    {
+        if (target == null)
+        {
+            return;
+        }
+
+        if (transitionRoutine != null)
+        {
+            StopCoroutine(transitionRoutine);
+            transitionRoutine = null;
+        }
+
+        menuTransitionActive = true;
+        followVelocity = Vector3.zero;
+        zoomVelocity = 0f;
+        transform.SetPositionAndRotation(target.position, target.rotation);
+    }
+
+    /// <summary>平滑移动到指定机位，可在结束后恢复游戏中的玩家追踪。</summary>
+    public void MoveToMenuPosition(
+        Transform target,
+        bool resumePlayerFollowAfter = false,
+        Action onComplete = null)
+    {
+        if (target == null)
+        {
+            if (resumePlayerFollowAfter) menuTransitionActive = false;
+            onComplete?.Invoke();
+            return;
+        }
+
+        if (transitionRoutine != null)
+        {
+            StopCoroutine(transitionRoutine);
+        }
+
+        transitionRoutine = StartCoroutine(
+            MoveToPositionRoutine(target, resumePlayerFollowAfter, onComplete));
+    }
+
+    private IEnumerator MoveToPositionRoutine(
+        Transform target,
+        bool resumePlayerFollowAfter,
+        Action onComplete)
+    {
+        menuTransitionActive = true;
+        followVelocity = Vector3.zero;
+        zoomVelocity = 0f;
+
+        Vector3 startPosition = transform.position;
+        Quaternion startRotation = transform.rotation;
+        float elapsed = 0f;
+
+        while (elapsed < transitionDuration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float normalizedTime = Mathf.Clamp01(elapsed / transitionDuration);
+            float easedTime = transitionCurve.Evaluate(normalizedTime);
+            transform.SetPositionAndRotation(
+                Vector3.LerpUnclamped(startPosition, target.position, easedTime),
+                Quaternion.SlerpUnclamped(startRotation, target.rotation, easedTime));
+            yield return null;
+        }
+
+        transform.SetPositionAndRotation(target.position, target.rotation);
+        menuTransitionActive = !resumePlayerFollowAfter;
+        transitionRoutine = null;
+        onComplete?.Invoke();
+    }
+
     public void ShakeForElimination(int eliminatedBallCount)
     {
         if (eliminatedBallCount <= 0)
@@ -135,7 +221,7 @@ public class CameraController : MonoBehaviour
 
         shakeRemainingTime = Mathf.Max(0f, shakeRemainingTime - Time.unscaledDeltaTime);
         float fade = shakeRemainingTime / shakeDuration;
-        Vector2 randomOffset = Random.insideUnitCircle * shakeStrength * fade;
+        Vector2 randomOffset = UnityEngine.Random.insideUnitCircle * shakeStrength * fade;
         previousShakeOffset = new Vector3(randomOffset.x, 0f, randomOffset.y);
         transform.position += previousShakeOffset;
     }

@@ -20,6 +20,15 @@ public class GameView : MonoBehaviour
     [SerializeField] private Button battleModeButton;
     [SerializeField] private Button quitButton;
 
+    [Header("Camera Positions")]
+    [SerializeField] private CameraController cameraController;
+    [Tooltip("主菜单镜头机位")]
+    [SerializeField] private Transform cameraPosition1;
+    [Tooltip("选择/加入玩家页面镜头机位")]
+    [SerializeField] private Transform cameraPosition2;
+    [Tooltip("正式游戏镜头机位")]
+    [SerializeField] private Transform cameraPosition3;
+
     [Header("Join Page")]
     [SerializeField] private Button startGameButton;
     [SerializeField] private Text keyboardStatusText;
@@ -64,6 +73,16 @@ public class GameView : MonoBehaviour
         if (ballSpawn == null)
         {
             ballSpawn = FindObjectOfType<BallSpawn>();
+        }
+
+        if (cameraController == null)
+        {
+            cameraController = FindObjectOfType<CameraController>();
+        }
+
+        if (cameraController != null && cameraPosition1 != null)
+        {
+            cameraController.SnapToMenuPosition(cameraPosition1);
         }
 
         CacheCountdownStyle();
@@ -175,6 +194,11 @@ public class GameView : MonoBehaviour
 
     public void OpenBattleMode()
     {
+        if (cameraController != null)
+        {
+            cameraController.MoveToMenuPosition(cameraPosition2);
+        }
+
         ShowPage(joinPage);
         if (playerSpawner != null)
         {
@@ -189,6 +213,11 @@ public class GameView : MonoBehaviour
         if (playerSpawner == null || !playerSpawner.BothPlayersJoined)
         {
             return;
+        }
+
+        if (cameraController != null)
+        {
+            cameraController.MoveToMenuPosition(cameraPosition3, true);
         }
 
         playerSpawner.enabled = false;
@@ -239,6 +268,27 @@ public class GameView : MonoBehaviour
     public void ReturnToMainMenu()
     {
         savedRestartJoinOrder = null;
+        isPlaying = false;
+
+        if (cameraController != null && cameraPosition1 != null)
+        {
+            if (returnToMenuButton != null)
+            {
+                returnToMenuButton.interactable = false;
+            }
+
+            cameraController.MoveToMenuPosition(
+                cameraPosition1,
+                false,
+                ReloadCurrentScene);
+            return;
+        }
+
+        ReloadCurrentScene();
+    }
+
+    private static void ReloadCurrentScene()
+    {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
