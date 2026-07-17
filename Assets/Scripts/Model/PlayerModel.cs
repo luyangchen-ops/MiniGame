@@ -21,14 +21,16 @@ public class PlayerModel : MonoBehaviour
     }
 
     [SerializeField] private List<CollectedBallData> collectedBalls = new List<CollectedBallData>();
+    [SerializeField, Min(0)] private int eliminationScore;
 
     public IReadOnlyList<CollectedBallData> CollectedBalls => collectedBalls;
     public int BallCount => collectedBalls.Count;
+    public int EliminationScore => eliminationScore;
 
     // Temporary scoring rule: one point for each currently collected ball.
     // Other systems should read Score instead of BallCount so the scoring
     // implementation can be replaced later without changing its consumers.
-    public int Score => BallCount;
+    public int Score => BallCount + eliminationScore;
 
     public void AddBall(CollectibleBall ball)
     {
@@ -124,6 +126,7 @@ public class PlayerModel : MonoBehaviour
 
         Vector3 eliminationCenter = GetBallGroupCenter(removedBalls);
         collectedBalls.RemoveRange(first, matchCount);
+        AddEliminationScore(matchCount);
         TriggerEliminationFeedback(matchCount, eliminationCenter);
         foreach (CollectibleBall ball in removedBalls)
         {
@@ -167,6 +170,7 @@ public class PlayerModel : MonoBehaviour
 
         Vector3 eliminationCenter = GetBallGroupCenter(removedBalls);
         collectedBalls.RemoveRange(first, removeCount);
+        AddEliminationScore(removeCount);
         TriggerEliminationFeedback(removeCount, eliminationCenter);
         foreach (CollectibleBall ball in removedBalls)
         {
@@ -193,6 +197,11 @@ public class PlayerModel : MonoBehaviour
         }
 
         return validBallCount > 0 ? center / validBallCount : Vector3.zero;
+    }
+
+    private void AddEliminationScore(int eliminatedBallCount)
+    {
+        eliminationScore += Mathf.Max(0, eliminatedBallCount - 2);
     }
 
     private static void TriggerEliminationFeedback(

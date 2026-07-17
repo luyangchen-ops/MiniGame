@@ -90,11 +90,20 @@ public class AudioManager : MonoBehaviour
     {
         if (source != null)
         {
+            // Scene-owned AudioSources would otherwise be destroyed when a
+            // rematch reloads the scene, leaving the persistent manager with
+            // missing references. Parent them to this object so they persist
+            // together with the AudioManager.
+            if (source.transform != transform && !source.transform.IsChildOf(transform))
+            {
+                source.transform.SetParent(transform, true);
+            }
+
             return source;
         }
 
         GameObject sourceObject = new GameObject(objectName);
-        sourceObject.transform.SetParent(transform);
+        sourceObject.transform.SetParent(transform, false);
         return sourceObject.AddComponent<AudioSource>();
     }
 }

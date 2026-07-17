@@ -173,11 +173,27 @@ public class BallSpawn : MonoBehaviour
             specialItem = item.AddComponent<SpecialItem>();
         }
 
-        specialItem.Initialize(this, item, GetRandomSpecialEffect());
+        SpecialItem.EffectType effectType = GetRandomSpecialEffect();
+        specialItem.Initialize(this, item, effectType);
 
-        if (item.GetComponent<SpecialItemGoldenGlow>() == null)
+        SpecialItemGoldenGlow goldenGlow = item.GetComponent<SpecialItemGoldenGlow>();
+        if (goldenGlow == null)
         {
-            item.AddComponent<SpecialItemGoldenGlow>();
+            goldenGlow = item.AddComponent<SpecialItemGoldenGlow>();
+        }
+
+        bool isExplosive = effectType == SpecialItem.EffectType.ExplosiveBall;
+        goldenGlow.enabled = !isExplosive;
+
+        ExplosiveBallGlow explosiveGlow = item.GetComponent<ExplosiveBallGlow>();
+        if (explosiveGlow == null && isExplosive)
+        {
+            explosiveGlow = item.AddComponent<ExplosiveBallGlow>();
+        }
+
+        if (explosiveGlow != null)
+        {
+            explosiveGlow.SetVisible(isExplosive);
         }
     }
 

@@ -76,6 +76,7 @@ public class GameView : MonoBehaviour
 
     [Header("Countdown Warning")]
     [SerializeField, Min(0f)] private float redWarningTime = 30f;
+    [SerializeField] private Color warningColor = new Color32(0, 229, 255, 255);
     [SerializeField, Min(0f)] private float urgentWarningTime = 10f;
     [SerializeField, Min(1f)] private float urgentFontScale = 1.5f;
     [SerializeField, Min(0f)] private float shakeAmount = 6f;
@@ -451,12 +452,12 @@ public class GameView : MonoBehaviour
 
         if (playerOneScoreText != null)
         {
-            playerOneScoreText.text = $"Player 1 Score: {playerOneScore}";
+            playerOneScoreText.text = playerOneScore.ToString();
         }
 
         if (playerTwoScoreText != null)
         {
-            playerTwoScoreText.text = $"Player 2 Score: {playerTwoScore}";
+            playerTwoScoreText.text = playerTwoScore.ToString();
         }
 
         if (winnerText != null)
@@ -645,7 +646,7 @@ public class GameView : MonoBehaviour
         bool isRedWarning = remainingTime <= redWarningTime;
         bool isUrgent = remainingTime <= urgentWarningTime;
 
-        countdownText.color = isRedWarning ? Color.red : countdownDefaultColor;
+        countdownText.color = isRedWarning ? warningColor : countdownDefaultColor;
         countdownText.fontSize = isUrgent
             ? Mathf.RoundToInt(countdownDefaultFontSize * urgentFontScale)
             : countdownDefaultFontSize;

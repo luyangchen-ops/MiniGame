@@ -15,19 +15,22 @@
   <component name="ChangeListManager">
     <list default="true" id="1ecfb919-4a46-4eac-b802-c218dfa358c1" name="更改" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.MiniGame/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.MiniGame/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Player/fork (gamepad).prefab" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Player/fork (gamepad).prefab.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Player/fork.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Player/fork.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Player/spoon (gamepad).prefab" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Player/spoon (gamepad).prefab.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Player/spoon.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Player/spoon.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Material/1.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Material/1.mat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Model/spoonhead/defaultMat 1.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Model/spoonhead/defaultMat 1.mat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Pic/结算/LOSESPOON.png" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Pic/结算/LOSESPOON.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Pic/结算/LOSESPOON.png.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Pic/结算/LOSESPOON.png.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/Main.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Main.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/Main717.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Main717.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/Main717.unity.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Main717.unity.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Audio system/Audio Manager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Audio system/Audio Manager.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/BallSpawn.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/BallSpawn.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/ExplosiveBallGlow.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/ExplosiveBallGlow.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/GameView.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/GameView.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/PlayerController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/PlayerController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Logs/AssetImportWorker0.log" beforeDir="false" afterPath="$PROJECT_DIR$/Logs/AssetImportWorker0.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Model/PlayerModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Model/PlayerModel.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Settings/URP-Balanced.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Settings/URP-Balanced.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Settings/URP-HighFidelity.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Settings/URP-HighFidelity.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Settings/URP-Performant.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Settings/URP-Performant.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSettings/BurstAotSettings_StandaloneWindows.json" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/BurstAotSettings_StandaloneWindows.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSettings/CommonBurstAotSettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/CommonBurstAotSettings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -53,23 +56,23 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.000000220915937" />
-      <entry key="MS500" value="1.0497837299658286" />
-      <entry key="S2" value="1.8406040702638775" />
-      <entry key="S5" value="2.755492358657951" />
-      <entry key="S10" value="3.2848334797154544" />
-      <entry key="S30" value="4.014158270579633" />
-      <entry key="S60" value="6.067098973028913" />
-      <entry key="M2" value="12.774076269001895" />
-      <entry key="M5" value="29.90660034910231" />
-      <entry key="M10" value="49.82616549688988" />
-      <entry key="M15" value="66.2970510332229" />
-      <entry key="M30" value="106.33607363362978" />
-      <entry key="H1" value="157.13076565999683" />
-      <entry key="H2" value="204.0988082278522" />
-      <entry key="H4" value="255.2862588264536" />
-      <entry key="D1" value="767.5694752963846" />
-      <entry key="W1" value="1197.6171480119308" />
+      <entry key="MS100" value="1.0123490595003894" />
+      <entry key="MS500" value="1.5010872766347985" />
+      <entry key="S2" value="2.3440372787202177" />
+      <entry key="S5" value="2.698164934343822" />
+      <entry key="S10" value="2.843654125643806" />
+      <entry key="S30" value="3.5724030266883817" />
+      <entry key="S60" value="6.051609482032914" />
+      <entry key="M2" value="11.423152903652502" />
+      <entry key="M5" value="22.227143327284086" />
+      <entry key="M10" value="32.35770238470394" />
+      <entry key="M15" value="40.55082337384883" />
+      <entry key="M30" value="64.60061917643921" />
+      <entry key="H1" value="115.26917382317525" />
+      <entry key="H2" value="188.93209730701022" />
+      <entry key="H4" value="271.5005512698777" />
+      <entry key="D1" value="817.6646460201922" />
+      <entry key="W1" value="1277.843136237534" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
@@ -79,35 +82,35 @@
       <entry key="S10" value="0.0" />
       <entry key="S30" value="0.0" />
       <entry key="S60" value="0.0" />
-      <entry key="M2" value="1.7295332872433637E-225" />
-      <entry key="M5" value="1.8870130106192925E-90" />
-      <entry key="M10" value="1.9426743208146432E-45" />
-      <entry key="M15" value="1.9615956569859198E-30" />
-      <entry key="M30" value="1.981109818508789E-15" />
-      <entry key="H1" value="6.357718504125685E-8" />
-      <entry key="H2" value="3.8004335185526866E-4" />
-      <entry key="H4" value="0.03166291331334052" />
-      <entry key="D1" value="1.3875978756146958" />
-      <entry key="W1" value="2.686159678076724" />
+      <entry key="M2" value="2.6168519381791056E-241" />
+      <entry key="M5" value="8.865739878321943E-97" />
+      <entry key="M10" value="1.3315885272154526E-48" />
+      <entry key="M15" value="1.524952049911475E-32" />
+      <entry key="M30" value="1.7467546126423925E-16" />
+      <entry key="H1" value="1.8878303737346504E-8" />
+      <entry key="H2" value="2.070923121062553E-4" />
+      <entry key="H4" value="0.02337309856305635" />
+      <entry key="D1" value="1.3191409308961337" />
+      <entry key="W1" value="2.666815109227042" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.972655159329006" />
-      <entry key="MS500" value="1.0437891891890843" />
-      <entry key="S2" value="1.8362230812009546" />
-      <entry key="S5" value="2.752214422650753" />
-      <entry key="S10" value="3.282743685105231" />
-      <entry key="S30" value="4.0133019981653195" />
-      <entry key="S60" value="6.0665476408332255" />
-      <entry key="M2" value="12.773618562359935" />
-      <entry key="M5" value="29.906235001197047" />
-      <entry key="M10" value="49.825875640612786" />
-      <entry key="M15" value="66.2967970027519" />
-      <entry key="M30" value="106.33586997653687" />
-      <entry key="H1" value="157.13061380696618" />
-      <entry key="H2" value="204.09908863421455" />
-      <entry key="H4" value="255.31785163957096" />
-      <entry key="D1" value="768.9569894773001" />
-      <entry key="W1" value="1200.3032863822568" />
+      <entry key="MS100" value="0.9514510009522438" />
+      <entry key="MS500" value="1.484637946843249" />
+      <entry key="S2" value="2.337660387242198" />
+      <entry key="S5" value="2.6951996890827803" />
+      <entry key="S10" value="2.842085200514942" />
+      <entry key="S30" value="3.5717836308141817" />
+      <entry key="S60" value="6.051149842159027" />
+      <entry key="M2" value="11.422762236990488" />
+      <entry key="M5" value="22.226857205739687" />
+      <entry key="M10" value="32.3575006459332" />
+      <entry key="M15" value="40.55065883537201" />
+      <entry key="M30" value="64.60049303235448" />
+      <entry key="H1" value="115.26906297812079" />
+      <entry key="H2" value="188.93221328784634" />
+      <entry key="H4" value="271.5238530607872" />
+      <entry key="D1" value="818.9837039489179" />
+      <entry key="W1" value="1280.509929696973" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -151,6 +154,16 @@
       <option name="MIXED_MODE_DEBUG" value="0" />
       <method v="2" />
     </configuration>
+    <configuration name="独立播放器" type="RunUnityExe" factoryName="Unity Executable">
+      <option name="EXE_PATH" value="$PROJECT_DIR$/../../demo\MiniGame.exe" />
+      <option name="PROGRAM_PARAMETERS" value="" />
+      <option name="WORKING_DIRECTORY" value="D:\cly\demo" />
+      <option name="PASS_PARENT_ENVS" value="1" />
+      <option name="ENV_FILE_PATHS" value="" />
+      <option name="REDIRECT_INPUT_PATH" value="" />
+      <option name="MIXED_MODE_DEBUG" value="0" />
+      <method v="2" />
+    </configuration>
     <configuration name="单元测试(批处理模式)" type="RunUnityExe" factoryName="Unity Executable">
       <option name="EXE_PATH" value="C:\Program Files\Unity\Hub\Editor\2022.3.47f1\Editor\Unity.exe" />
       <option name="PROGRAM_PARAMETERS" value="-runTests -batchmode -projectPath D:\cly\project\MiniGame -testResults Logs/results.xml -logFile Logs/Editor.log -testPlatform EditMode -debugCodeOptimization" />
@@ -187,7 +200,7 @@
       <updated>1784029647811</updated>
       <workItem from="1784029649788" duration="35000" />
       <workItem from="1784080721222" duration="15831000" />
-      <workItem from="1784167919914" duration="27055000" />
+      <workItem from="1784167919914" duration="29694000" />
     </task>
     <servers />
   </component>
