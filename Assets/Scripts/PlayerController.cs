@@ -45,6 +45,8 @@ public class PlayerController : MonoBehaviour
 
     private Rigidbody body;
     private PlayerModel playerModel;
+    private Collider playerCollider;
+    private Vector3 playerCenterOffset;
     private Vector3 desiredDirection;
     private Quaternion prefabRotationOffset = Quaternion.identity;
     private float movementAmount;
@@ -112,7 +114,7 @@ public class PlayerController : MonoBehaviour
         dashRequested = false;
         dashRemainingDistance = 0f;
         trail.Clear();
-        trail.Add(destination.position);
+        trail.Add(GetPlayerCenter(destination.position, destination.rotation));
     }
 
     public void SetKeyboardControlScheme(KeyboardControlScheme scheme)
@@ -124,6 +126,13 @@ public class PlayerController : MonoBehaviour
     {
         body = GetComponent<Rigidbody>();
         playerModel = GetComponent<PlayerModel>();
+        playerCollider = GetComponentInChildren<Collider>();
+        if (playerCollider != null)
+        {
+            playerCenterOffset = Quaternion.Inverse(body.rotation)
+                                 * (playerCollider.bounds.center - body.position);
+        }
+
         playerRadius = GetHorizontalRadius();
 
         // Movement is constrained to the horizontal XZ plane.
@@ -136,7 +145,7 @@ public class PlayerController : MonoBehaviour
         Quaternion initialFacing = Quaternion.LookRotation(desiredDirection, Vector3.up);
         prefabRotationOffset = Quaternion.Inverse(initialFacing) * body.rotation;
 
-        trail.Add(body.position);
+        trail.Add(GetPlayerCenter(body.position, body.rotation));
     }
 
     private void Update()
@@ -204,7 +213,7 @@ public class PlayerController : MonoBehaviour
             Vector3 nextPosition = body.position
                                    + forward * (currentSpeed * Time.fixedDeltaTime);
             body.MovePosition(nextPosition);
-            RecordTrailPoint(nextPosition);
+            RecordTrailPoint(GetPlayerCenter(nextPosition, nextRotation));
         }
 
         UpdateBallChain();
@@ -230,10 +239,11 @@ public class PlayerController : MonoBehaviour
         float step = Mathf.Min(dashRemainingDistance, dashSpeed * Time.fixedDeltaTime);
         Vector3 nextPosition = body.position + dashDirection * step;
 
-        body.MoveRotation(Quaternion.LookRotation(dashDirection, Vector3.up)
-                          * prefabRotationOffset);
+        Quaternion dashRotation = Quaternion.LookRotation(dashDirection, Vector3.up)
+                                  * prefabRotationOffset;
+        body.MoveRotation(dashRotation);
         body.MovePosition(nextPosition);
-        RecordTrailPoint(nextPosition);
+        RecordTrailPoint(GetPlayerCenter(nextPosition, dashRotation));
         dashRemainingDistance -= step;
     }
 
@@ -257,7 +267,7 @@ public class PlayerController : MonoBehaviour
         launchDirection.y = 0f;
         launchDirection.Normalize();
 
-        Vector3 launchPosition = body.position
+        Vector3 launchPosition = GetPlayerCenter(body.position, body.rotation)
                                  + launchDirection * (playerRadius + ball.WorldRadius + launchClearance);
         launchPosition.y = ball.transform.position.y;
 
@@ -470,7 +480,7 @@ public class PlayerController : MonoBehaviour
                 Vector3 forward = body.rotation * Vector3.forward;
                 forward.y = 0f;
                 forward.Normalize();
-                Vector3 launchReadyPosition = body.position
+                Vector3 launchReadyPosition = GetPlayerCenter(body.position, body.rotation)
                                               + forward * (playerRadius
                                                            + ball.WorldRadius
                                                            + launchClearance);
@@ -521,7 +531,6 @@ public class PlayerController : MonoBehaviour
 
     private float GetHorizontalRadius()
     {
-        Collider playerCollider = GetComponent<Collider>();
         if (playerCollider != null)
         {
             return Mathf.Max(playerCollider.bounds.extents.x, playerCollider.bounds.extents.z);
@@ -531,11 +540,16 @@ public class PlayerController : MonoBehaviour
         return Mathf.Max(Mathf.Abs(scale.x), Mathf.Abs(scale.z)) * 0.5f;
     }
 
+    private Vector3 GetPlayerCenter(Vector3 position, Quaternion rotation)
+    {
+        return position + rotation * playerCenterOffset;
+    }
+
     private Vector3 GetTrailPosition(float distanceBehind)
     {
         if (trail.Count == 0)
         {
-            return body.position;
+            return GetPlayerCenter(body.position, body.rotation);
         }
 
         float travelled = 0f;

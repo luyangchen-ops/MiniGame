@@ -134,7 +134,6 @@ GameObject:
   - component: {fileID: 59387628}
   - component: {fileID: 59387627}
   - component: {fileID: 59387626}
-  - component: {fileID: 59387625}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -165,50 +164,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!114 &59387625
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 59387623}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c0762cf150192d0458edd38d53a4c435, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  gameDuration: 180
-  playerSpawner: {fileID: 0}
-  ballSpawn: {fileID: 0}
-  mainPage: {fileID: 0}
-  joinPage: {fileID: 0}
-  hudPage: {fileID: 0}
-  resultPage: {fileID: 0}
-  battleModeButton: {fileID: 0}
-  quitButton: {fileID: 0}
-  cameraController: {fileID: 0}
-  cameraPosition1: {fileID: 0}
-  cameraPosition2: {fileID: 0}
-  cameraPosition3: {fileID: 0}
-  startGameButton: {fileID: 0}
-  keyboardStatusText: {fileID: 0}
-  gamepadStatusText: {fileID: 0}
-  playerOneBattlePosition: {fileID: 0}
-  playerTwoBattlePosition: {fileID: 0}
-  countdownText: {fileID: 0}
-  playerOneCooldownIcon: {fileID: 0}
-  playerTwoCooldownIcon: {fileID: 0}
-  dashCooldownColor: {r: 0.25, g: 0.25, b: 0.25, a: 1}
-  dashReadyColor: {r: 1, g: 1, b: 1, a: 1}
-  playerOneScoreText: {fileID: 0}
-  playerTwoScoreText: {fileID: 0}
-  winnerText: {fileID: 0}
-  playAgainButton: {fileID: 0}
-  returnToMenuButton: {fileID: 0}
-  redWarningTime: 30
-  urgentWarningTime: 10
-  urgentFontScale: 1.5
-  shakeAmount: 6
 --- !u!114 &59387626
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -804,7 +759,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0762cf150192d0458edd38d53a4c435, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameDuration: 180
+  gameDuration: 90
   playerSpawner: {fileID: 984059572}
   ballSpawn: {fileID: 2057633694}
   mainPage: {fileID: 648152451}
@@ -832,6 +787,20 @@ MonoBehaviour:
   winnerText: {fileID: 1018178392}
   playAgainButton: {fileID: 1827554768}
   returnToMenuButton: {fileID: 1555537716}
+  playerOneResultImage: {fileID: 0}
+  playerTwoResultImage: {fileID: 0}
+  playerOneFrameImage: {fileID: 0}
+  playerTwoFrameImage: {fileID: 0}
+  playerOneWinSprite: {fileID: 21300000, guid: 3dd81f9b0bb22da4891bd6047e3a2de3, type: 3}
+  playerOneLoseSprite: {fileID: 21300000, guid: 28186f8ee6e514e45b41a3a5e2dfa3c7,
+    type: 3}
+  playerOneDrawSprite: {fileID: 0}
+  playerTwoWinSprite: {fileID: 21300000, guid: 27dc2191d5ff4ec419531373f71d1bf7, type: 3}
+  playerTwoLoseSprite: {fileID: 21300000, guid: f0c9ccf8cbcc82547bd90bae3b2da074,
+    type: 3}
+  playerTwoDrawSprite: {fileID: 0}
+  winFrameSprite: {fileID: 21300000, guid: b3b3f43fc101d0e4988a05a00db8eb53, type: 3}
+  loseFrameSprite: {fileID: 21300000, guid: 596ec61816eff0b4ca05efb06e50bfd0, type: 3}
   redWarningTime: 20
   urgentWarningTime: 10
   urgentFontScale: 1.5
@@ -1848,9 +1817,9 @@ MonoBehaviour:
     type: 3}
   playerTwoKeyboardPrefab: {fileID: 9035236320198195596, guid: 81aaae32b13ff284096e15b546d4a0b9,
     type: 3}
-  playerOneGamepadPrefab: {fileID: 7558738958037256094, guid: c3d5b83800a1d844ab83e395a1c1b2e8,
+  playerOneGamepadPrefab: {fileID: 8659251493937846002, guid: 6d996a8d69d8e9f4f9a4ac6b28f1c584,
     type: 3}
-  playerTwoGamepadPrefab: {fileID: 7725085472685234577, guid: c68989085ea9c7547855ea854f4e263d,
+  playerTwoGamepadPrefab: {fileID: 9035236320198195596, guid: b3382796a7b627344a968f297cfa76e3,
     type: 3}
   playerOneJoinModel: {fileID: 1310586048}
   playerTwoJoinModel: {fileID: 1694336644}
@@ -3847,7 +3816,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1754903187
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4610,7 +4579,7 @@ Transform:
   m_GameObject: {fileID: 2057633692}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 10.48, y: 8.18, z: 34.22}
+  m_LocalPosition: {x: 10.48, y: 7.82, z: 34.22}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4638,15 +4607,16 @@ MonoBehaviour:
     type: 3}
   ballCount: 30
   ballScale: 1
-  ballSpawnInterval: 30
-  ballsPerSpawn: 20
+  ballSpawnInterval: 15
+  ballsPerSpawn: 10
   specialItemPrefab: {fileID: 1366379723790487257, guid: d3b581d81041c6645bea9f9ba94a6912,
     type: 3}
   specialItemCount: 0
   specialItemScale: 1
-  specialItemSpawnInterval: 20
+  specialItemSpawnInterval: 10
+  specialItemsPerSpawn: 1
   normalEffectWeight: 1
-  explosiveBallWeight: 2
+  explosiveBallWeight: 3
   infectionWeight: 2
   spawnRadius: 8.43
   spawnCenterOffset: {x: 0, y: 0}

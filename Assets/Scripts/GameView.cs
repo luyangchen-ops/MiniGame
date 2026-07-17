@@ -3,6 +3,10 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
+
 public class GameView : MonoBehaviour
 {
     [Header("Game")]
@@ -54,6 +58,22 @@ public class GameView : MonoBehaviour
     [SerializeField] private Button playAgainButton;
     [SerializeField] private Button returnToMenuButton;
 
+    [Header("Result Image Targets")]
+    [SerializeField] private Image playerOneResultImage;
+    [SerializeField] private Image playerTwoResultImage;
+    [SerializeField] private Image playerOneFrameImage;
+    [SerializeField] private Image playerTwoFrameImage;
+
+    [Header("Result Sprites")]
+    [SerializeField] private Sprite playerOneWinSprite;
+    [SerializeField] private Sprite playerOneLoseSprite;
+    [SerializeField] private Sprite playerOneDrawSprite;
+    [SerializeField] private Sprite playerTwoWinSprite;
+    [SerializeField] private Sprite playerTwoLoseSprite;
+    [SerializeField] private Sprite playerTwoDrawSprite;
+    [SerializeField] private Sprite winFrameSprite;
+    [SerializeField] private Sprite loseFrameSprite;
+
     [Header("Countdown Warning")]
     [SerializeField, Min(0f)] private float redWarningTime = 30f;
     [SerializeField, Min(0f)] private float urgentWarningTime = 10f;
@@ -68,6 +88,7 @@ public class GameView : MonoBehaviour
     private Vector2 countdownDefaultPosition;
     private Image playerOneCooldownFill;
     private Image playerTwoCooldownFill;
+    private bool isPauseMenuOpen;
     private static PlayerSpawner.PlayerJoinType[] savedRestartJoinOrder;
 
     public bool IsPlaying => isPlaying;
@@ -75,6 +96,8 @@ public class GameView : MonoBehaviour
 
     private void Awake()
     {
+        Time.timeScale = 1f;
+
         if (playerSpawner == null)
         {
             playerSpawner = FindObjectOfType<PlayerSpawner>();
@@ -190,6 +213,20 @@ public class GameView : MonoBehaviour
     {
         RefreshJoinPage();
 
+        if (isPlaying && WasPausePressed())
+        {
+            if (isPauseMenuOpen)
+            {
+                ResumeGame();
+            }
+            else
+            {
+                ShowPauseMenu();
+            }
+
+            return;
+        }
+
         if (!isPlaying)
         {
             return;
@@ -280,6 +317,7 @@ public class GameView : MonoBehaviour
             playerSpawner.JoinOrder[0],
             playerSpawner.JoinOrder[1]
         };
+        Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
@@ -287,6 +325,8 @@ public class GameView : MonoBehaviour
     {
         savedRestartJoinOrder = null;
         isPlaying = false;
+        isPauseMenuOpen = false;
+        Time.timeScale = 1f;
         PlayMenuMusic();
 
         if (cameraController != null && cameraPosition1 != null)
@@ -332,6 +372,8 @@ public class GameView : MonoBehaviour
     private void EndGame()
     {
         isPlaying = false;
+        isPauseMenuOpen = false;
+        Time.timeScale = 1f;
         foreach (PlayerController player in players)
         {
             if (player != null)
@@ -346,8 +388,60 @@ public class GameView : MonoBehaviour
             countdownText.rectTransform.anchoredPosition = countdownDefaultPosition;
         }
 
+        SetResultTextVisible(true);
         RefreshResultPage();
         ShowPage(resultPage);
+    }
+
+    private void ShowPauseMenu()
+    {
+        isPauseMenuOpen = true;
+        Time.timeScale = 0f;
+
+        foreach (PlayerController player in players)
+        {
+            if (player != null)
+            {
+                player.enabled = false;
+            }
+        }
+
+        SetResultTextVisible(false);
+        SetAllResultImagesVisible(false);
+        ShowPage(resultPage);
+    }
+
+    private void ResumeGame()
+    {
+        isPauseMenuOpen = false;
+        Time.timeScale = 1f;
+
+        foreach (PlayerController player in players)
+        {
+            if (player != null)
+            {
+                player.enabled = true;
+            }
+        }
+
+        ShowPage(hudPage);
+        RefreshHud();
+    }
+
+    private void SetResultTextVisible(bool visible)
+    {
+        if (playerOneScoreText != null) playerOneScoreText.gameObject.SetActive(visible);
+        if (playerTwoScoreText != null) playerTwoScoreText.gameObject.SetActive(visible);
+        if (winnerText != null) winnerText.gameObject.SetActive(visible);
+    }
+
+    private static bool WasPausePressed()
+    {
+#if ENABLE_INPUT_SYSTEM
+        return Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame;
+#else
+        return Input.GetKeyDown(KeyCode.Escape);
+#endif
     }
 
     private void RefreshResultPage()
@@ -370,6 +464,60 @@ public class GameView : MonoBehaviour
             winnerText.text = playerOneScore == playerTwoScore
                 ? "DRAW"
                 : playerOneScore > playerTwoScore ? "PLAYER 1 WINS" : "PLAYER 2 WINS";
+        }
+
+        RefreshResultImages(playerOneScore, playerTwoScore);
+    }
+
+    private void RefreshResultImages(int playerOneScore, int playerTwoScore)
+    {
+        SetAllResultImagesVisible(false);
+        if (playerOneScore == playerTwoScore)
+        {
+            SetImageSprite(playerOneResultImage, playerOneDrawSprite);
+            SetImageSprite(playerTwoResultImage, playerTwoDrawSprite);
+            return;
+        }
+
+        bool playerOneWins = playerOneScore > playerTwoScore;
+        SetImageSprite(
+            playerOneResultImage,
+            playerOneWins ? playerOneWinSprite : playerOneLoseSprite);
+        SetImageSprite(
+            playerTwoResultImage,
+            playerOneWins ? playerTwoLoseSprite : playerTwoWinSprite);
+        SetImageSprite(
+            playerOneFrameImage,
+            playerOneWins ? winFrameSprite : loseFrameSprite);
+        SetImageSprite(
+            playerTwoFrameImage,
+            playerOneWins ? loseFrameSprite : winFrameSprite);
+    }
+
+    private void SetAllResultImagesVisible(bool visible)
+    {
+        SetImageVisible(playerOneResultImage, visible);
+        SetImageVisible(playerTwoResultImage, visible);
+        SetImageVisible(playerOneFrameImage, visible);
+        SetImageVisible(playerTwoFrameImage, visible);
+    }
+
+    private static void SetImageSprite(Image image, Sprite sprite)
+    {
+        if (image == null)
+        {
+            return;
+        }
+
+        image.sprite = sprite;
+        image.gameObject.SetActive(sprite != null);
+    }
+
+    private static void SetImageVisible(Image image, bool visible)
+    {
+        if (image != null)
+        {
+            image.gameObject.SetActive(visible);
         }
     }
 

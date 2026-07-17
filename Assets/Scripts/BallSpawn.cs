@@ -20,6 +20,7 @@ public class BallSpawn : MonoBehaviour
     [SerializeField, Min(0)] private int specialItemCount = 3;
     [SerializeField, Min(0.01f)] private float specialItemScale = 1f;
     [SerializeField, Min(0.1f)] private float specialItemSpawnInterval = 20f;
+    [SerializeField, Min(0)] private int specialItemsPerSpawn = 1;
     [SerializeField, Min(0f)] private float normalEffectWeight = 1f;
     [SerializeField, Min(0f)] private float explosiveBallWeight = 2f;
     [SerializeField, Min(0f)] private float infectionWeight = 2f;
@@ -128,8 +129,11 @@ public class BallSpawn : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(specialItemSpawnInterval);
-            SpawnSpecialItem(spawnedSpecialItemCount);
-            spawnedSpecialItemCount++;
+            for (int i = 0; i < specialItemsPerSpawn; i++)
+            {
+                SpawnSpecialItem(spawnedSpecialItemCount);
+                spawnedSpecialItemCount++;
+            }
         }
     }
 

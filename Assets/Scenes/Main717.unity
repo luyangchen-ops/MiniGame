@@ -205,6 +205,18 @@ MonoBehaviour:
   winnerText: {fileID: 0}
   playAgainButton: {fileID: 0}
   returnToMenuButton: {fileID: 0}
+  playerOneResultImage: {fileID: 0}
+  playerTwoResultImage: {fileID: 0}
+  playerOneFrameImage: {fileID: 0}
+  playerTwoFrameImage: {fileID: 0}
+  playerOneWinSprite: {fileID: 0}
+  playerOneLoseSprite: {fileID: 0}
+  playerOneDrawSprite: {fileID: 0}
+  playerTwoWinSprite: {fileID: 0}
+  playerTwoLoseSprite: {fileID: 0}
+  playerTwoDrawSprite: {fileID: 0}
+  winFrameSprite: {fileID: 0}
+  loseFrameSprite: {fileID: 0}
   redWarningTime: 30
   urgentWarningTime: 10
   urgentFontScale: 1.5
@@ -832,6 +844,18 @@ MonoBehaviour:
   winnerText: {fileID: 1018178392}
   playAgainButton: {fileID: 1827554768}
   returnToMenuButton: {fileID: 1555537716}
+  playerOneResultImage: {fileID: 0}
+  playerTwoResultImage: {fileID: 0}
+  playerOneFrameImage: {fileID: 0}
+  playerTwoFrameImage: {fileID: 0}
+  playerOneWinSprite: {fileID: 0}
+  playerOneLoseSprite: {fileID: 0}
+  playerOneDrawSprite: {fileID: 0}
+  playerTwoWinSprite: {fileID: 0}
+  playerTwoLoseSprite: {fileID: 0}
+  playerTwoDrawSprite: {fileID: 0}
+  winFrameSprite: {fileID: 0}
+  loseFrameSprite: {fileID: 0}
   redWarningTime: 20
   urgentWarningTime: 10
   urgentFontScale: 1.5
@@ -4645,6 +4669,7 @@ MonoBehaviour:
   specialItemCount: 0
   specialItemScale: 1
   specialItemSpawnInterval: 20
+  specialItemsPerSpawn: 1
   normalEffectWeight: 1
   explosiveBallWeight: 2
   infectionWeight: 2
