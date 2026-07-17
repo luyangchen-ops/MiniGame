@@ -117,14 +117,25 @@ public class PlayerSpawner : MonoBehaviour
         {
             Transform battlePosition = i == 0 ? playerOnePosition : playerTwoPosition;
             PlayerJoinType joinType = joinOrder[i];
+            GameObject battlePrefab = GetBattlePrefab(i, joinType);
             GameObject playerObject = Instantiate(
-                GetBattlePrefab(i, joinType),
+                battlePrefab,
                 battlePosition.position,
-                battlePosition.rotation);
+                battlePrefab.transform.rotation);
             PlayerController controller = playerObject.GetComponent<PlayerController>();
             if (controller == null)
             {
                 controller = playerObject.GetComponentInChildren<PlayerController>();
+            }
+
+            if (controller != null)
+            {
+                Rigidbody playerBody = controller.GetComponent<Rigidbody>();
+                if (playerBody != null)
+                {
+                    playerBody.constraints |= RigidbodyConstraints.FreezeRotationX
+                                              | RigidbodyConstraints.FreezeRotationZ;
+                }
             }
 
             if (controller != null)

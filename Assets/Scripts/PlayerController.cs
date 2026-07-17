@@ -46,6 +46,7 @@ public class PlayerController : MonoBehaviour
     private Rigidbody body;
     private PlayerModel playerModel;
     private Vector3 desiredDirection;
+    private Quaternion prefabRotationOffset = Quaternion.identity;
     private float movementAmount;
     private float playerRadius = 0.5f;
     private bool launchRequested;
@@ -132,6 +133,9 @@ public class PlayerController : MonoBehaviour
             desiredDirection = Vector3.forward;
         }
 
+        Quaternion initialFacing = Quaternion.LookRotation(desiredDirection, Vector3.up);
+        prefabRotationOffset = Quaternion.Inverse(initialFacing) * body.rotation;
+
         trail.Add(body.position);
     }
 
@@ -186,7 +190,8 @@ public class PlayerController : MonoBehaviour
         }
         else if (movementAmount > 0f)
         {
-            Quaternion targetRotation = Quaternion.LookRotation(desiredDirection, Vector3.up);
+            Quaternion targetRotation = Quaternion.LookRotation(desiredDirection, Vector3.up)
+                                        * prefabRotationOffset;
             float currentSpeed = moveSpeed * GetSpeedMultiplier() * movementAmount;
             float angularSpeed = currentSpeed / Mathf.Max(turnRadius, 0.1f) * Mathf.Rad2Deg;
             Quaternion nextRotation = Quaternion.RotateTowards(
@@ -225,7 +230,8 @@ public class PlayerController : MonoBehaviour
         float step = Mathf.Min(dashRemainingDistance, dashSpeed * Time.fixedDeltaTime);
         Vector3 nextPosition = body.position + dashDirection * step;
 
-        body.MoveRotation(Quaternion.LookRotation(dashDirection, Vector3.up));
+        body.MoveRotation(Quaternion.LookRotation(dashDirection, Vector3.up)
+                          * prefabRotationOffset);
         body.MovePosition(nextPosition);
         RecordTrailPoint(nextPosition);
         dashRemainingDistance -= step;
@@ -355,7 +361,18 @@ public class PlayerController : MonoBehaviour
             if (showAimGuide)
             {
                 Vector3 start = body.position + Vector3.up * aimGuideHeightOffset;
+                CollectibleBall firstBall = playerModel != null
+                                            && playerModel.CollectedBalls.Count > 0
+                    ? playerModel.CollectedBalls[0].Ball
+                    : null;
+                if (firstBall != null)
+                {
+                    start.y = firstBall.transform.position.y;
+                }
+
                 Vector3 forward = body.rotation * Vector3.forward;
+                forward.y = 0f;
+                forward.Normalize();
                 aimGuide.SetPosition(0, start);
                 aimGuide.SetPosition(1, start + forward * aimGuideLength);
             }
@@ -468,6 +485,10 @@ public class PlayerController : MonoBehaviour
             distanceBehind += previousRadius + ball.WorldRadius + ballGap;
 
             Vector3 target = GetTrailPosition(distanceBehind);
+            // Follow the player's trail only on the XZ plane. Keeping the ball's
+            // own Y position prevents collected balls from being lifted to, or
+            // sunk toward, the player's Rigidbody center height.
+            target.y = ball.transform.position.y;
             ball.transform.position = Vector3.MoveTowards(
                 ball.transform.position,
                 target,

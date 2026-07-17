@@ -598,7 +598,7 @@ Transform:
   m_GameObject: {fileID: 239719330}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 10.5, y: 8.18, z: 34.37}
+  m_LocalPosition: {x: 10.5, y: 8.45, z: 34.37}
   m_LocalScale: {x: 2.1, y: 2.1, z: 2.1}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -1102,7 +1102,7 @@ Transform:
   m_GameObject: {fileID: 495803650}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 13.1, y: 8.63, z: 34.07}
+  m_LocalPosition: {x: 13.1, y: 9.12, z: 34.07}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1497,8 +1497,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   musicSource: {fileID: 2072693084}
   soundEffectSource: {fileID: 1044660508}
-  menuMusic: {fileID: 0}
-  gameplayMusic: {fileID: 0}
+  menuMusic: {fileID: 8300000, guid: 18552c2e2cc32e44fb53bc7bad7e0287, type: 3}
+  gameplayMusic: {fileID: 8300000, guid: 9718571bb8583774692a6fc1755a3399, type: 3}
 --- !u!4 &788781906
 Transform:
   m_ObjectHideFlags: 0
@@ -1809,7 +1809,7 @@ Transform:
   m_GameObject: {fileID: 951639946}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 8.41, y: 8.51, z: 33.33}
+  m_LocalPosition: {x: 8.41, y: 9.68, z: 33.33}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1844,13 +1844,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ddbfe99275cd33c41a3bc45ffdc8d691, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerOneKeyboardPrefab: {fileID: 8896537532148112727, guid: be678fc1de1a68a4bb42f5feda15dcc9,
+  playerOneKeyboardPrefab: {fileID: 8659251493937846002, guid: 0682ce62bbce4a440855fc95c99c8403,
     type: 3}
-  playerTwoKeyboardPrefab: {fileID: 8896537532148112727, guid: be678fc1de1a68a4bb42f5feda15dcc9,
+  playerTwoKeyboardPrefab: {fileID: 9035236320198195596, guid: 81aaae32b13ff284096e15b546d4a0b9,
     type: 3}
-  playerOneGamepadPrefab: {fileID: 8963564878216719370, guid: a349803a4c6451140af1c254674e1b77,
+  playerOneGamepadPrefab: {fileID: 7558738958037256094, guid: c3d5b83800a1d844ab83e395a1c1b2e8,
     type: 3}
-  playerTwoGamepadPrefab: {fileID: 8963564878216719370, guid: a349803a4c6451140af1c254674e1b77,
+  playerTwoGamepadPrefab: {fileID: 7725085472685234577, guid: c68989085ea9c7547855ea854f4e263d,
     type: 3}
   playerOneJoinModel: {fileID: 1310586048}
   playerTwoJoinModel: {fileID: 1694336644}
@@ -4610,7 +4610,7 @@ Transform:
   m_GameObject: {fileID: 2057633692}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 10.48, y: 7.87, z: 34.22}
+  m_LocalPosition: {x: 10.48, y: 8.18, z: 34.22}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
